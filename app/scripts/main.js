@@ -286,7 +286,7 @@ function restart() {
 
         // insert new node at point
         var point = d3.mouse(this),
-        node = {id: ++lastNodeId, reflexive: false};
+        node = {id: ++lastNodeId, reflexive: false, membership_functions: []};
         node.x = point[0];
         node.y = point[1];
         nodes.push(node);
