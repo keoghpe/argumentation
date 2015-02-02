@@ -68,6 +68,24 @@ module.exports = function (grunt) {
       }
     },
 
+    // Build control for deploying to Github
+
+    buildcontrol: {
+      options: {
+        dir: 'dist',
+        commit: true,
+        push: true,
+        message: 'Built %sourceName% from commit %sourceCommit% on branch %sourceBranch%'
+      },
+      pages: {
+        options: {
+          remote: 'git@github.com:keoghpe/argumentation.git',
+          branch: 'gh-pages'
+        }
+      }
+    },
+
+
     // The actual grunt server settings
     connect: {
       options: {
@@ -350,7 +368,7 @@ module.exports = function (grunt) {
       }
     },
 
-    // Generates a custom Modernizr build that includes only the tests you
+    // Generates a custom Modernizr  that includes only the tests you
     // reference in your app
     modernizr: {
       dist: {
@@ -437,7 +455,8 @@ module.exports = function (grunt) {
     'modernizr',
     'rev',
     'usemin',
-    'htmlmin'
+    'htmlmin',
+    'buildcontrol'
   ]);
 
   grunt.registerTask('default', [
