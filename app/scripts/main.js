@@ -19,25 +19,76 @@ var nodes = [
   {
     id: 0,
     reflexive: false,
-    membership_functions: [
-    [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
-    [{x: 10, y: 140}, {x: 30, y: 0}, {x: 140, y: 0}, {x: 200, y: 150}, {x: 125, y: 125}]
+    membership_functions: [{
+      title: "Something else",
+      points: [{x: 1, y: 25}, {x: 0, y: 0}, {x: 10, y: 0}, {x: 20, y: 25}, {x: 22, y: 12}],
+      xLabel: "X Label",
+      yLabel: "Y Label",
+      xMin: 0,
+      xMax: 250,
+      yMin: 0,
+      yMax: 300,
+    },
+    {
+      title: "Something 1",
+      points: [{x: 10, y: 140}, {x: 30, y: 0}, {x: 140, y: 0}, {x: 200, y: 150}, {x: 125, y: 125}],
+      xLabel: "X Label",
+      yLabel: "Y Label",
+      xMin: 0,
+      xMax: 250,
+      yMin: 0,
+      yMax: 300,
+    }
     ]
   },
   {
     id: 1,
     reflexive: true,
-    membership_functions: [
-    [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
-    [{x: 10, y: 140}, {x: 30, y: 0}, {x: 140, y: 0}, {x: 200, y: 150}, {x: 125, y: 125}]
+    membership_functions: [{
+      title: "Something 2",
+      points: [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
+      xLabel: "X Label",
+      yLabel: "Y Label",
+      xMin: 0,
+      xMax: 250,
+      yMin: 0,
+      yMax: 300,
+    },
+    {
+      title: "Something 3",
+      points: [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
+      xLabel: "X Label",
+      yLabel: "Y Label",
+      xMin: 0,
+      xMax: 250,
+      yMin: 0,
+      yMax: 300,
+    }
     ]
   },
   {
     id: 2,
     reflexive: false,
-    membership_functions: [
-    [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
-    [{x: 10, y: 140}, {x: 30, y: 0}, {x: 140, y: 0}, {x: 200, y: 150}, {x: 125, y: 125}]
+    membership_functions: [{
+      title: "Something 4",
+      points: [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
+      xLabel: "X Label",
+      yLabel: "Y Label",
+      xMin: 0,
+      xMax: 250,
+      yMin: 0,
+      yMax: 300,
+    },
+    {
+      title: "Something 5",
+      points: [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
+      xLabel: "X Label",
+      yLabel: "Y Label",
+      xMin: 0,
+      xMax: 250,
+      yMin: 0,
+      yMax: 300,
+    }
     ]
   }
 ],
@@ -328,74 +379,75 @@ function restart() {
     var lastKeyDown = -1;
 
     function keydown() {
-        d3.event.preventDefault();
-
-        if(lastKeyDown !== -1) return;
-        lastKeyDown = d3.event.keyCode;
-
-        // ctrl
-        if(d3.event.keyCode === 17) {
-            circle.call(force.drag);
-            svg.classed('ctrl', true);
-        }
-
-        if(!selected_node && !selected_link) return;
-        switch(d3.event.keyCode) {
-            case 8: // backspace
-            case 46: // delete
-            if(selected_node) {
-                nodes.splice(nodes.indexOf(selected_node), 1);
-                spliceLinksForNode(selected_node);
-            } else if(selected_link) {
-                links.splice(links.indexOf(selected_link), 1);
-            }
-            selected_link = null;
-            selected_node = null;
-            restart();
-            break;
-            case 66: // B
-            if(selected_link) {
-                // set link direction to both left and right
-                selected_link.left = true;
-                selected_link.right = true;
-            }
-            restart();
-            break;
-            case 76: // L
-            if(selected_link) {
-                // set link direction to left only
-                selected_link.left = true;
-                selected_link.right = false;
-            }
-            restart();
-            break;
-            case 82: // R
-            if(selected_node) {
-                // toggle node reflexivity
-                selected_node.reflexive = !selected_node.reflexive;
-            } else if(selected_link) {
-                // set link direction to right only
-                selected_link.left = false;
-                selected_link.right = true;
-            }
-            restart();
-            break;
-        }
+        // d3.event.preventDefault();
+        //
+        // if(lastKeyDown !== -1) return;
+        // lastKeyDown = d3.event.keyCode;
+        //
+        // // ctrl
+        // if(d3.event.keyCode === 17) {
+        //     circle.call(force.drag);
+        //     svg.classed('ctrl', true);
+        // }
+        //
+        // if(!selected_node && !selected_link) return;
+        // switch(d3.event.keyCode) {
+        //     case 8: // backspace
+        //     case 46: // delete
+        //     if(selected_node) {
+        //         nodes.splice(nodes.indexOf(selected_node), 1);
+        //         spliceLinksForNode(selected_node);
+        //     } else if(selected_link) {
+        //         links.splice(links.indexOf(selected_link), 1);
+        //     }
+        //     selected_link = null;
+        //     selected_node = null;
+        //     restart();
+        //     break;
+        //     case 66: // B
+        //     if(selected_link) {
+        //         // set link direction to both left and right
+        //         selected_link.left = true;
+        //         selected_link.right = true;
+        //     }
+        //     restart();
+        //     break;
+        //     case 76: // L
+        //     if(selected_link) {
+        //         // set link direction to left only
+        //         selected_link.left = true;
+        //         selected_link.right = false;
+        //     }
+        //     restart();
+        //     break;
+        //     case 82: // R
+        //     if(selected_node) {
+        //         // toggle node reflexivity
+        //         selected_node.reflexive = !selected_node.reflexive;
+        //     } else if(selected_link) {
+        //         // set link direction to right only
+        //         selected_link.left = false;
+        //         selected_link.right = true;
+        //     }
+        //     restart();
+        //     break;
+        // }
     }
 
     function keyup() {
-        lastKeyDown = -1;
-
-        // ctrl
-        if(d3.event.keyCode === 17) {
-            circle
-            .on('mousedown.drag', null)
-            .on('touchstart.drag', null);
-            svg.classed('ctrl', false);
-        }
+        // lastKeyDown = -1;
+        //
+        // // ctrl
+        // if(d3.event.keyCode === 17) {
+        //     circle
+        //     .on('mousedown.drag', null)
+        //     .on('touchstart.drag', null);
+        //     svg.classed('ctrl', false);
+        // }
     }
 
     function drawCurves(){
+      fillForm();
       var ul = d3.select("#mf-list");
       ul.selectAll("li").remove();
       d3.select("#vis").selectAll("svg").remove();
@@ -417,7 +469,7 @@ function restart() {
           .append("div")
           .attr("id", id);
 
-          bezier(points, id);
+          bezier(selected_node.membership_functions[i].points, id);
         }
 
         $('#mf-list li button').click(function(){
@@ -425,6 +477,19 @@ function restart() {
           drawCurves();
         });
       });
+    }
+
+    function fillForm(){
+      if(selected_node.membership_functions.length > 0){
+        var memFunc = selected_node.membership_functions[current_function];
+        $('#titleField').val(memFunc.title);
+        $('#xAxisField').val(memFunc.xLabel);
+        $('#yAxisField').val(memFunc.yLabel);
+        $('#xMinField').val(memFunc.xMin);
+        $('#xMaxField').val(memFunc.xMax);
+        $('#yMinField').val(memFunc.yMin);
+        $('#yMaxField').val(memFunc.yMax);
+      }
     }
 
     // app starts here
@@ -439,7 +504,6 @@ function restart() {
 /////////////////////
 
 function bezier(_points, id){
-  console.log(_points);
   var w = 250,
   h = 300,
   t = .5,
@@ -594,8 +658,16 @@ $('#submitter').click(
 
 $('#creator').click(
   function(){
-    selected_node.membership_functions.push([
-      {x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}]
+    selected_node.membership_functions.push({
+      title: "Something",
+      xLabel: "X Label",
+      yLabel: "Y Label",
+      xMin: 0,
+      xMax: 250,
+      yMin: 0,
+      yMax: 300,
+      points: [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}]
+    }
     );
     // var id = "curve" + selected_node.membership_functions.length;
     // d3.select("#vis")
