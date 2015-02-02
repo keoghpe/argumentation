@@ -93,7 +93,8 @@ var selected_node = null,
 selected_link = null,
 mousedown_link = null,
 mousedown_node = null,
-mouseup_node = null;
+mouseup_node = null,
+current_function = 0;
 
 function resetMouseVars() {
     mousedown_node = null;
@@ -148,7 +149,8 @@ function restart() {
         mousedown_link = d;
         if(mousedown_link === selected_link) selected_link = null;
         else selected_link = mousedown_link;
-        selected_node = null;
+        //STOP THE SELECTED NODE BECOMING UNSELECTED
+        //selected_node = null;
         restart();
     });
 
@@ -189,7 +191,7 @@ function restart() {
 
         // select node
         mousedown_node = d;
-        if(mousedown_node === selected_node) selected_node = null;
+        if(mousedown_node === selected_node) selected_node = null; //STOP THIS
         else selected_node = mousedown_node;
         selected_link = null;
 
@@ -244,7 +246,7 @@ function restart() {
 
             // select new link
             selected_link = link;
-            selected_node = null;
+            //selected_node = null;
             restart();
         });
 
@@ -272,15 +274,10 @@ function restart() {
         if(d3.event.ctrlKey || mousedown_link) return;
 
         if(mousedown_node){
-          d3.select("#vis").selectAll("svg").remove();
-          mousedown_node.membership_functions.forEach(function(points, i){
-            var id = "curve" + i;
-            d3.select("#vis")
-            .append("div")
-            .attr("id", id);
 
-            bezier(points, id);
-          });
+          current_function = 0;
+
+          drawCurves();
           return;
         }
 
@@ -396,6 +393,38 @@ function restart() {
             .on('touchstart.drag', null);
             svg.classed('ctrl', false);
         }
+    }
+
+    function drawCurves(){
+      var ul = d3.select("#mf-list");
+      ul.selectAll("li").remove();
+      d3.select("#vis").selectAll("svg").remove();
+      selected_node.membership_functions.forEach(function(points, i){
+        // add a button with the number for each mf
+        //<button class="btn btn-default">Button</button>
+        var li = ul.append("li")
+        .append("button")
+        .attr("class", "btn btn-default")
+        .text(i + 1);
+
+        //The mf is the selected one
+        if(i === current_function){
+          // Draw the function
+
+          li.attr("class", "btn btn-success");
+          var id = "curve" + i;
+          d3.select("#vis")
+          .append("div")
+          .attr("id", id);
+
+          bezier(points, id);
+        }
+
+        $('#mf-list li button').click(function(){
+          current_function = $(this).text() - 1;
+          drawCurves();
+        });
+      });
     }
 
     // app starts here
@@ -568,10 +597,11 @@ $('#creator').click(
     selected_node.membership_functions.push([
       {x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}]
     );
-    var id = "curve" + selected_node.membership_functions.length;
-    d3.select("#vis")
-    .append("div")
-    .attr("id", id);
-    bezier(selected_node.membership_functions[selected_node.membership_functions.length - 1],id);
-
+    // var id = "curve" + selected_node.membership_functions.length;
+    // d3.select("#vis")
+    // .append("div")
+    // .attr("id", id);
+    // bezier(selected_node.membership_functions[selected_node.membership_functions.length - 1],id);
+    current_function = selected_node.membership_functions.length -1;
+    drawCurves();
 });
