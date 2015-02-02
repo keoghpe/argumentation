@@ -147,3 +147,21 @@ text.id {
     text-anchor: middle;
     font-weight: bold;
 }
+
+
+.curve, .line {
+    fill: none;
+    stroke-width: 1px;
+}
+.curve {
+    stroke: red;
+    stroke-width: 3px;
+}
+.control {
+    fill: #ccc;
+    stroke: #000;
+    stroke-width: .5px;
+}
+.t, .controltext {
+    font-size: .6em;
+}

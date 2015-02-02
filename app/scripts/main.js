@@ -1,7 +1,7 @@
 "use strict"
 
 // set up SVG for D3
-var width  = 960,
+var width  = 480,
 height = 500,
 colors = d3.scale.category10();
 
@@ -9,20 +9,42 @@ var svg = d3.select('#graph')
 .append('svg')
 .attr('width', width)
 .attr('height', height);
+var points = [];
 
 // set up initial nodes and links
 //  - nodes are known by 'id', not by index in array.
 //  - reflexive edges are indicated on the node (as a bold black circle).
 //  - links are always source < target; edge directions are set by 'left' and 'right'.
 var nodes = [
-{id: 0, reflexive: false},
-{id: 1, reflexive: true },
-{id: 2, reflexive: false}
+  {
+    id: 0,
+    reflexive: false,
+    membership_functions: [
+    [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
+    [{x: 10, y: 140}, {x: 30, y: 0}, {x: 140, y: 0}, {x: 200, y: 150}, {x: 125, y: 125}]
+    ]
+  },
+  {
+    id: 1,
+    reflexive: true,
+    membership_functions: [
+    [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
+    [{x: 10, y: 140}, {x: 30, y: 0}, {x: 140, y: 0}, {x: 200, y: 150}, {x: 125, y: 125}]
+    ]
+  },
+  {
+    id: 2,
+    reflexive: false,
+    membership_functions: [
+    [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
+    [{x: 10, y: 140}, {x: 30, y: 0}, {x: 140, y: 0}, {x: 200, y: 150}, {x: 125, y: 125}]
+    ]
+  }
 ],
-lastNodeId = 2,
-links = [
-{source: nodes[0], target: nodes[1], left: false, right: true },
-{source: nodes[1], target: nodes[2], left: false, right: true }
+  lastNodeId = 2,
+  links = [
+    {source: nodes[0], target: nodes[1], left: false, right: true },
+    {source: nodes[1], target: nodes[2], left: false, right: true }
 ];
 
 // init D3 force layout
@@ -247,7 +269,20 @@ function restart() {
         // because :active only works in WebKit?
         svg.classed('active', true);
 
-        if(d3.event.ctrlKey || mousedown_node || mousedown_link) return;
+        if(d3.event.ctrlKey || mousedown_link) return;
+
+        if(mousedown_node){
+          d3.select("#vis").selectAll("svg").remove();
+          mousedown_node.membership_functions.forEach(function(points, i){
+            var id = "curve" + i;
+            d3.select("#vis")
+            .append("div")
+            .attr("id", id);
+
+            bezier(points, id);
+          });
+          return;
+        }
 
         // insert new node at point
         var point = d3.mouse(this),
@@ -372,45 +407,44 @@ function restart() {
     .on('keyup', keyup);
     restart();
 
+/////////////////////
 
+function bezier(_points, id){
+  console.log(_points);
+  var w = 250,
+  h = 300,
+  t = .5,
+  delta = .01,
+  padding = 10,
+  points = _points,
+  bezier = {},
+  line = d3.svg.line().x(x).y(y),
+  n = 4,
+  stroke = d3.scale.category20b(),
+  orders = d3.range(2, n + 2);
 
-///////////////////////
+  var vis = d3.select('#'+id).selectAll("svg")
+  .data([5])
+  .enter().append("svg")
+  .attr("width", w + 2 * padding)
+  .attr("height", h + 2 * padding)
+  .append("g")
+  .attr("transform", "translate(" + padding + "," + padding + ")");
 
+  update();
 
-var w = 250,
-h = 300,
-t = .5,
-delta = .01,
-padding = 10,
-points = [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
-bezier = {},
-line = d3.svg.line().x(x).y(y),
-n = 4,
-stroke = d3.scale.category20b(),
-orders = d3.range(2, n + 2);
-
-var vis = d3.select("#vis").selectAll("svg")
-.data(orders)
-.enter().append("svg")
-.attr("width", w + 2 * padding)
-.attr("height", h + 2 * padding)
-.append("g")
-.attr("transform", "translate(" + padding + "," + padding + ")");
-
-update();
-
-vis.selectAll("circle.control")
-.data(function(d) { return points.slice(0, d) })
-.enter().append("circle")
-.attr("class", "control")
-.attr("r", 7)
-.attr("cx", x)
-.attr("cy", y)
-.call(d3.behavior.drag()
-.on("dragstart", function(d) {
+  vis.selectAll("circle.control")
+  .data(function(d) { return points.slice(0, 6) })
+  .enter().append("circle")
+  .attr("class", "control")
+  .attr("r", 7)
+  .attr("cx", x)
+  .attr("cy", y)
+  .call(d3.behavior.drag()
+  .on("dragstart", function(d) {
     this.__origin__ = [d.x, d.y];
-})
-.on("drag", function(d) {
+  })
+  .on("drag", function(d) {
     d.x = Math.min(w, Math.max(0, this.__origin__[0] += d3.event.dx));
     d.y = Math.min(h, Math.max(0, this.__origin__[1] += d3.event.dy));
     bezier = {};
@@ -418,33 +452,34 @@ vis.selectAll("circle.control")
     vis.selectAll("circle.control")
     .attr("cx", x)
     .attr("cy", y);
-})
-.on("dragend", function() {
+  })
+  .on("dragend", function() {
     delete this.__origin__;
-}));
+  }));
 
-vis.append("text")
-.attr("class", "t")
-.attr("x", w / 2)
-.attr("y", h)
-.attr("text-anchor", "middle");
+  vis.append("text")
+  .attr("class", "t")
+  .attr("x", w / 2)
+  .attr("y", h)
+  .attr("text-anchor", "middle");
 
-vis.selectAll("text.controltext")
-.data(function(d) { return points.slice(0, d); })
-.enter().append("text")
-.attr("class", "controltext")
-.attr("dx", "10px")
-.attr("dy", ".4em")
-.text(function(d, i) { return "P" + i });
+  vis.selectAll("text.controltext")
+  .data(function(d) { return points.slice(0, 6); })
+  .enter().append("text")
+  .attr("class", "controltext")
+  .attr("dx", "10px")
+  .attr("dy", ".4em")
+  .text(function(d, i) { return "P" + i });
 
-var last = 0;
-d3.timer(function(elapsed) {
-    t = (t + (elapsed - last) / 5000) % 1;
-    last = elapsed;
+  var last = 0;
+  d3.timer(function(elapsed) {
+    // t = (t + (elapsed - last) / 5000) % 1;
+    // last = elapsed;
+    t = 1;
     update();
-});
+  });
 
-function update() {
+  function update() {
     var interpolation = vis.selectAll("g")
     .data(function(d) { return getLevels(d, t); });
     interpolation.enter().append("g")
@@ -459,12 +494,12 @@ function update() {
     .attr("cx", x)
     .attr("cy", y);
 
-    var path = interpolation.selectAll("path")
-    .data(function(d) { return [d]; });
-    path.enter().append("path")
-    .attr("class", "line")
-    .attr("d", line);
-    path.attr("d", line);
+    // var path = interpolation.selectAll("path")
+    // .data(function(d) { return [d]; });
+    // path.enter().append("path")
+    // .attr("class", "line")
+    // .attr("d", line);
+    // path.attr("d", line);
 
     var curve = vis.selectAll("path.curve")
     .data(getCurve);
@@ -477,42 +512,66 @@ function update() {
     .attr("y", y);
     vis.selectAll("text.t")
     .text("t=" + t.toFixed(2));
-}
+  }
 
-function interpolate(d, p) {
+  function interpolate(d, p) {
     if (arguments.length < 2) p = t;
     var r = [];
     for (var i=1; i<d.length; i++) {
-        var d0 = d[i-1], d1 = d[i];
-        r.push({x: d0.x + (d1.x - d0.x) * p, y: d0.y + (d1.y - d0.y) * p});
+      var d0 = d[i-1], d1 = d[i];
+      r.push({x: d0.x + (d1.x - d0.x) * p, y: d0.y + (d1.y - d0.y) * p});
     }
     return r;
-}
+  }
 
-function getLevels(d, t_) {
+  function getLevels(d, t_) {
     if (arguments.length < 2) t_ = t;
-    var x = [points.slice(0, d)];
+    var x = [points.slice(0, 6)];
     for (var i=1; i<d; i++) {
-        x.push(interpolate(x[x.length-1], t_));
+      x.push(interpolate(x[x.length-1], t_));
     }
     return x;
-}
+  }
 
-function getCurve(d) {
+  function getCurve(d) {
     var curve = bezier[d];
     if (!curve) {
-        curve = bezier[d] = [];
-        for (var t_=0; t_<=1; t_+=delta) {
-            var x = getLevels(d, t_);
-            curve.push(x[x.length-1][0]);
-        }
+      curve = bezier[d] = [];
+      for (var t_=0; t_<=1; t_+=delta) {
+        var x = getLevels(d, t_);
+        curve.push(x[x.length-1][0]);
+      }
     }
     return [curve.slice(0, t / delta + 1)];
-}
+  }
 
-function x(d) { return d.x; }
-function y(d) { return d.y; }
-function colour(d, i) {
+  function x(d) { return d.x; }
+  function y(d) { return d.y; }
+  function colour(d, i) {
     stroke(-i);
     return d.length > 1 ? stroke(i) : "red";
+  }
 }
+
+
+
+$('#submitter').click(
+  function(){
+    alert(JSON.stringify({nodes: nodes, links: links}));
+    $.post( "test.php", {nodes: nodes, links: links} );
+  }
+);
+
+
+$('#creator').click(
+  function(){
+    selected_node.membership_functions.push([
+      {x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}]
+    );
+    var id = "curve" + selected_node.membership_functions.length;
+    d3.select("#vis")
+    .append("div")
+    .attr("id", id);
+    bezier(selected_node.membership_functions[selected_node.membership_functions.length - 1],id);
+
+});

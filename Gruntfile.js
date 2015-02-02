@@ -75,7 +75,15 @@ module.exports = function (grunt) {
         open: true,
         livereload: 35729,
         // Change this to '0.0.0.0' to access the server from outside
-        hostname: 'localhost'
+        hostname: 'localhost',
+        onCreateServer: function(server, connect, options) {
+            var io = require('socket.io').listen(server);
+            io.sockets.on('connection', function(socket) {
+                socket.on('node', function(n){
+                    io.emit('node', n);
+                });
+            });
+        }
       },
       livereload: {
         options: {
