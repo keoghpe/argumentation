@@ -25,9 +25,9 @@ var nodes = [
       xLabel: "X Label",
       yLabel: "Y Label",
       xMin: 0,
-      xMax: 250,
+      xMax: 50,
       yMin: 0,
-      yMax: 300,
+      yMax: 50,
     },
     {
       title: "Something 1",
@@ -556,6 +556,14 @@ function bezier(memfunc, id){
                   .domain([memfunc.yMin, memfunc.yMax])
                   .range([h - 2*padding, 0]);
 
+  var xReverseScale = d3.scale.linear()
+                  .domain([0, w - 2*padding])
+                  .range([memfunc.xMin, memfunc.xMax]);
+
+  var yReverseScale = d3.scale.linear()
+                  .domain([0, h - 2*padding])
+                  .range([memfunc.yMin, memfunc.yMax]);
+
   var xAxis = d3.svg.axis();
   var yAxis = d3.svg.axis()
               .scale(yScale)
@@ -593,23 +601,32 @@ function bezier(memfunc, id){
   .enter().append("circle")
   .attr("class", "control")
   .attr("r", 7)
-  .attr("cx", x)
-  .attr("cy", y)
+  .attr("cx", function(d){
+    return xScale(d.x) + padding;
+  })
+  .attr("cy", function(d){
+    return yScale(d.y);
+  })
   .call(d3.behavior.drag()
   .on("dragstart", function(d) {
-
     //Drag behavior is here
 
     this.__origin__ = [d.x, d.y];
   })
   .on("drag", function(d) {
-    d.x = Math.min(w, Math.max(0, this.__origin__[0] += d3.event.dx));
-    d.y = Math.min(h, Math.max(0, this.__origin__[1] += d3.event.dy));
+
+    // everything needs to be scaled now to maintain consistency between
+    // view and model
+
+    // This line is fine
+    d.x = Math.min(memfunc.xMax, Math.max(memfunc.xMin, this.__origin__[0] += xReverseScale(d3.event.dx)));
+    d.y = Math.min(memfunc.yMax, Math.max(memfunc.yMin, this.__origin__[1] -= yReverseScale(d3.event.dy)));
+
     bezier = {};
     update();
-    vis.selectAll("circle.control")
-    .attr("cx", x)
-    .attr("cy", y);
+
+    // do something that scales the data to the graph
+
   })
   .on("dragend", function() {
     delete this.__origin__;
@@ -665,6 +682,10 @@ function bezier(memfunc, id){
     .attr("class", "curve");
     curve.attr("d", line);
 
+    vis.selectAll("circle.control")
+    .attr("cx", x)
+    .attr("cy", y);
+
     vis.selectAll("text.controltext")
     .attr("x", x)
     .attr("y", y);
@@ -703,8 +724,8 @@ function bezier(memfunc, id){
     return [curve.slice(0, t / delta + 1)];
   }
 
-  function x(d) { return d.x; }
-  function y(d) { return d.y; }
+  function x(d) { return xScale(d.x) + padding; }
+  function y(d) { return yScale(d.y); }
   function colour(d, i) {
     stroke(-i);
     return d.length > 1 ? stroke(i) : "red";
