@@ -469,7 +469,7 @@ function restart() {
           .append("div")
           .attr("id", id);
 
-          bezier(selected_node.membership_functions[i].points, id);
+          bezier(selected_node.membership_functions[i], id);
         }
 
         $('#mf-list li button').click(function(){
@@ -503,6 +503,7 @@ function restart() {
         memFunc.xMax = $('#xMaxField').val();
         memFunc.yMin = $('#yMinField').val();
         memFunc.yMax = $('#yMaxField').val();
+        bezier(memFunc, "AN ID THAT NEEDS TO BE REFACTORED");
       }
     });
 
@@ -518,13 +519,13 @@ function restart() {
 
 /////////////////////
 
-function bezier(_points, id){
+function bezier(memfunc, id){
   var w = 250,
   h = 300,
   t = .5,
   delta = .01,
   padding = 10,
-  points = _points,
+  points = memfunc.points,
   bezier = {},
   line = d3.svg.line().x(x).y(y),
   n = 4,
@@ -538,6 +539,14 @@ function bezier(_points, id){
   .attr("height", h + 2 * padding)
   .append("g")
   .attr("transform", "translate(" + padding + "," + padding + ")");
+
+  vis.append("text")
+  .attr("x", (w / 2))
+  .attr("y", 20)
+  .attr("text-anchor", "middle")
+  .style("font-size", "16px")
+  .style("text-decoration", "underline")
+  .text(memfunc.title);
 
   update();
 
