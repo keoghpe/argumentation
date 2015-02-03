@@ -644,13 +644,13 @@ function bezier(memfunc, id){
     .style("fill", colour)
     .style("stroke", colour);
 
-    var circle = interpolation.selectAll("circle")
-    .data(Object);
-    circle.enter().append("circle")
-    .attr("r", 4);
-    circle
-    .attr("cx", x)
-    .attr("cy", y);
+    // var circle = interpolation.selectAll("circle")
+    // .data(Object);
+    // circle.enter().append("circle")
+    // .attr("r", 4);
+    // circle
+    // .attr("cx", x)
+    // .attr("cy", y);
 
     // var path = interpolation.selectAll("path")
     // .data(function(d) { return [d]; });
