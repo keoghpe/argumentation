@@ -464,7 +464,9 @@ function restart() {
           // Draw the function
 
           li.attr("class", "btn btn-success");
-          var id = "curve" + i;
+          //var id = "curve" + i;
+
+          var id = "myCurve";
           d3.select("#vis")
           .append("div")
           .attr("id", id);
@@ -493,7 +495,7 @@ function restart() {
     }
 
     // Update the fields when they are edited
-    $('.mem-fn').blur(function(){
+    $('.mem-fn').keyup(function(){
       if(selected_node.membership_functions.length > 0){
         var memFunc = selected_node.membership_functions[current_function];
         memFunc.title = $('#titleField').val();
@@ -503,7 +505,8 @@ function restart() {
         memFunc.xMax = $('#xMaxField').val();
         memFunc.yMin = $('#yMinField').val();
         memFunc.yMax = $('#yMaxField').val();
-        bezier(memFunc, "AN ID THAT NEEDS TO BE REFACTORED");
+        d3.select("#vis").selectAll("svg").remove();
+        bezier(memFunc, "myCurve");
       }
     });
 
@@ -744,15 +747,21 @@ $('#submitter').click(
 
 $('#creator').click(
   function(){
+
+    if(selected_node === null){
+      alert("No node selected");
+      return;
+    }
+
     selected_node.membership_functions.push({
-      title: "Something",
+      title: "Title",
       xLabel: "X Label",
       yLabel: "Y Label",
       xMin: 0,
-      xMax: 250,
+      xMax: 100,
       yMin: 0,
-      yMax: 300,
-      points: [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}]
+      yMax: 1,
+      points: [{x: 0, y: 0}, {x: 25, y: .25}, {x: 50, y: .5}, {x: 75, y: .75}, {x: 100, y: 1}]
     }
     );
     // var id = "curve" + selected_node.membership_functions.length;
