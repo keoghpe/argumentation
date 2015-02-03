@@ -520,11 +520,11 @@ function restart() {
 /////////////////////
 
 function bezier(memfunc, id){
-  var w = 250,
+  var w = 500,
   h = 300,
   t = .5,
   delta = .01,
-  padding = 10,
+  padding = 30,
   points = memfunc.points,
   bezier = {},
   line = d3.svg.line().x(x).y(y),
@@ -542,11 +542,49 @@ function bezier(memfunc, id){
 
   vis.append("text")
   .attr("x", (w / 2))
-  .attr("y", 20)
+  .attr("y", padding)
   .attr("text-anchor", "middle")
   .style("font-size", "16px")
   .style("text-decoration", "underline")
   .text(memfunc.title);
+
+  var xScale = d3.scale.linear()
+                  .domain([memfunc.xMin, memfunc.xMax])
+                  .range([0, w - 2*padding]);
+
+  var yScale = d3.scale.linear()
+                  .domain([memfunc.yMin, memfunc.yMax])
+                  .range([h - 2*padding, 0]);
+
+  var xAxis = d3.svg.axis();
+  var yAxis = d3.svg.axis()
+              .scale(yScale)
+              .orient("left");
+
+  xAxis.scale(xScale);
+
+  vis.append("g")
+  .attr("class", "axis")
+  .attr("transform", "translate("+padding+","+ (h - 2 * padding) + ")")
+  .call(xAxis);
+
+  vis.append("g")
+  .attr("class", "axis")
+  .attr("transform", "translate(" + padding + ", 0)")
+  .call(yAxis);
+
+  vis.append("text")
+  .attr("x", w/2 - padding )
+  .attr("y",  h - padding)
+  .style("text-anchor", "middle")
+  .text(memfunc.xLabel);
+
+  vis.append("text")
+  .attr("transform", "rotate(-90)")
+  .attr("x", padding-(h/2))
+  .attr("y", 0)
+  .style("text-anchor", "middle")
+  .text(memfunc.yLabel);
 
   update();
 
@@ -559,6 +597,9 @@ function bezier(memfunc, id){
   .attr("cy", y)
   .call(d3.behavior.drag()
   .on("dragstart", function(d) {
+
+    //Drag behavior is here
+
     this.__origin__ = [d.x, d.y];
   })
   .on("drag", function(d) {
@@ -627,8 +668,8 @@ function bezier(memfunc, id){
     vis.selectAll("text.controltext")
     .attr("x", x)
     .attr("y", y);
-    vis.selectAll("text.t")
-    .text("t=" + t.toFixed(2));
+    // vis.selectAll("text.t")
+    // .text("t=" + t.toFixed(2));
   }
 
   function interpolate(d, p) {
