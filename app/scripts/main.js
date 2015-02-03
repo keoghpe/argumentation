@@ -492,6 +492,21 @@ function restart() {
       }
     }
 
+    // Update the fields when they are edited
+    $('.mem-fn').blur(function(){
+      if(selected_node.membership_functions.length > 0){
+        var memFunc = selected_node.membership_functions[current_function];
+        memFunc.title = $('#titleField').val();
+        memFunc.xLabel = $('#xAxisField').val();
+        memFunc.yLabel = $('#yAxisField').val();
+        memFunc.xMin = $('#xMinField').val();
+        memFunc.xMax = $('#xMaxField').val();
+        memFunc.yMin = $('#yMinField').val();
+        memFunc.yMax = $('#yMaxField').val();
+      }
+    });
+
+
     // app starts here
     svg.on('mousedown', mousedown)
     .on('mousemove', mousemove)
