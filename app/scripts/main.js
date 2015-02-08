@@ -494,23 +494,6 @@ function restart() {
       }
     }
 
-    // Update the fields when they are edited
-    $('.mem-fn').keyup(function(){
-      if(selected_node.membership_functions.length > 0){
-        var memFunc = selected_node.membership_functions[current_function];
-        memFunc.title = $('#titleField').val();
-        memFunc.xLabel = $('#xAxisField').val();
-        memFunc.yLabel = $('#yAxisField').val();
-        memFunc.xMin = $('#xMinField').val();
-        memFunc.xMax = $('#xMaxField').val();
-        memFunc.yMin = $('#yMinField').val();
-        memFunc.yMax = $('#yMaxField').val();
-        d3.select("#vis").selectAll("svg").remove();
-        bezier(memFunc, "myCurve");
-      }
-    });
-
-
     // app starts here
     svg.on('mousedown', mousedown)
     .on('mousemove', mousemove)
@@ -523,9 +506,10 @@ function restart() {
 /////////////////////
 
 function bezier(memfunc, id){
+
   var w = 500,
   h = 300,
-  t = .5,
+  t = 1,
   delta = .01,
   padding = 30,
   points = memfunc.points,
@@ -543,14 +527,14 @@ function bezier(memfunc, id){
   .append("g")
   .attr("transform", "translate(" + padding + "," + padding + ")");
 
-  vis.append("text")
-  .attr("x", (w / 2))
-  .attr("y", padding)
-  .attr("text-anchor", "middle")
-  .style("font-size", "16px")
-  .style("text-decoration", "underline")
-  .text(memfunc.title);
-
+  // vis.append("text")
+  // .attr("x", (w / 2))
+  // .attr("y", padding)
+  // .attr("text-anchor", "middle")
+  // .style("font-size", "16px")
+  // .style("text-decoration", "underline")
+  // .text(memfunc.title);
+  //
   var xScale = d3.scale.linear()
                   .domain([memfunc.xMin, memfunc.xMax])
                   .range([0, w - 2*padding]);
@@ -559,43 +543,36 @@ function bezier(memfunc, id){
                   .domain([memfunc.yMin, memfunc.yMax])
                   .range([h - 2*padding, 0]);
 
-  var xReverseScale = d3.scale.linear()
-                  .domain([0, w - 2*padding])
-                  .range([memfunc.xMin, memfunc.xMax]);
-
-  var yReverseScale = d3.scale.linear()
-                  .domain([0, h - 2*padding])
-                  .range([memfunc.yMin, memfunc.yMax]);
-
-  var xAxis = d3.svg.axis();
-  var yAxis = d3.svg.axis()
-              .scale(yScale)
-              .orient("left");
-
-  xAxis.scale(xScale);
-
-  vis.append("g")
-  .attr("class", "axis")
-  .attr("transform", "translate("+padding+","+ (h - 2 * padding) + ")")
-  .call(xAxis);
-
-  vis.append("g")
-  .attr("class", "axis")
-  .attr("transform", "translate(" + padding + ", 0)")
-  .call(yAxis);
-
-  vis.append("text")
-  .attr("x", w/2 - padding )
-  .attr("y",  h - padding)
-  .style("text-anchor", "middle")
-  .text(memfunc.xLabel);
-
-  vis.append("text")
-  .attr("transform", "rotate(-90)")
-  .attr("x", padding-(h/2))
-  .attr("y", 0)
-  .style("text-anchor", "middle")
-  .text(memfunc.yLabel);
+  //
+  // var xAxis = d3.svg.axis();
+  // var yAxis = d3.svg.axis()
+  //             .scale(yScale)
+  //             .orient("left");
+  //
+  // xAxis.scale(xScale);
+  //
+  // vis.append("g")
+  // .attr("class", "axis")
+  // .attr("transform", "translate("+padding+","+ (h - 2 * padding) + ")")
+  // .call(xAxis);
+  //
+  // vis.append("g")
+  // .attr("class", "axis")
+  // .attr("transform", "translate(" + padding + ", 0)")
+  // .call(yAxis);
+  //
+  // vis.append("text")
+  // .attr("x", w/2 - padding )
+  // .attr("y",  h - padding)
+  // .style("text-anchor", "middle")
+  // .text(memfunc.xLabel);
+  //
+  // vis.append("text")
+  // .attr("transform", "rotate(-90)")
+  // .attr("x", padding-(h/2))
+  // .attr("y", 0)
+  // .style("text-anchor", "middle")
+  // .text(memfunc.yLabel);
 
   update();
 
@@ -620,26 +597,31 @@ function bezier(memfunc, id){
 
     // everything needs to be scaled now to maintain consistency between
     // view and model
+    var xReverseScale = d3.scale.linear()
+    .domain([0, w - 2*padding])
+    .range([memfunc.xMin, memfunc.xMax]);
 
-    // This line is fine
+    var yReverseScale = d3.scale.linear()
+    .domain([0, h - 2*padding])
+    .range([memfunc.yMin, memfunc.yMax]);
+
+
     d.x = Math.min(memfunc.xMax, Math.max(memfunc.xMin, this.__origin__[0] += xReverseScale(d3.event.dx)));
     d.y = Math.min(memfunc.yMax, Math.max(memfunc.yMin, this.__origin__[1] -= yReverseScale(d3.event.dy)));
 
     bezier = {};
     update();
 
-    // do something that scales the data to the graph
-
   })
   .on("dragend", function() {
     delete this.__origin__;
   }));
 
-  vis.append("text")
-  .attr("class", "t")
-  .attr("x", w / 2)
-  .attr("y", h)
-  .attr("text-anchor", "middle");
+  // vis.append("text")
+  // .attr("class", "t")
+  // .attr("x", w / 2)
+  // .attr("y", h)
+  // .attr("text-anchor", "middle");
 
   vis.selectAll("text.controltext")
   .data(function(d) { return points.slice(0, 6); })
@@ -650,12 +632,12 @@ function bezier(memfunc, id){
   .text(function(d, i) { return "P" + i });
 
   var last = 0;
-  d3.timer(function(elapsed) {
-    // t = (t + (elapsed - last) / 5000) % 1;
-    // last = elapsed;
-    t = 1;
-    update();
-  });
+  // d3.timer(function(elapsed) {
+  //   // t = (t + (elapsed - last) / 5000) % 1;
+  //   // last = elapsed;
+  //   t = 1;
+  //   update();
+  // });
 
   function update() {
     var interpolation = vis.selectAll("g")
@@ -678,6 +660,73 @@ function bezier(memfunc, id){
     // .attr("class", "line")
     // .attr("d", line);
     // path.attr("d", line);
+
+    //////
+
+    xScale = d3.scale.linear()
+    .domain([memfunc.xMin, memfunc.xMax])
+    .range([0, w - 2*padding]);
+
+    yScale = d3.scale.linear()
+    .domain([memfunc.yMin, memfunc.yMax])
+    .range([h - 2*padding, 0]);
+
+    // xReverseScale = d3.scale.linear()
+    // .domain([0, w - 2*padding])
+    // .range([memfunc.xMin, memfunc.xMax]);
+    //
+    // yReverseScale = d3.scale.linear()
+    // .domain([0, h - 2*padding])
+    // .range([memfunc.yMin, memfunc.yMax]);
+
+    var xAxis = d3.svg.axis();
+    var yAxis = d3.svg.axis()
+    .scale(yScale)
+    .orient("left");
+
+    xAxis.scale(xScale);
+
+    d3.select("#vis").selectAll(".axis").remove();
+    d3.select("#vis").selectAll(".label").remove();
+    d3.select("#graphTitle").remove();
+
+
+    vis.append("text")
+    .attr("x", (w / 2))
+    .attr("y", padding)
+    .attr("text-anchor", "middle")
+    .attr("id", "graphTitle")
+    .style("font-size", "16px")
+    .style("text-decoration", "underline")
+    .text(memfunc.title);
+
+
+    vis.append("g")
+    .attr("class", "axis")
+    .attr("transform", "translate("+padding+","+ (h - 2 * padding) + ")")
+    .call(xAxis);
+
+    vis.append("g")
+    .attr("class", "axis")
+    .attr("transform", "translate(" + padding + ", 0)")
+    .call(yAxis);
+
+    vis.append("text")
+    .attr("class", "label")
+    .attr("x", w/2 - padding )
+    .attr("y",  h - padding)
+    .style("text-anchor", "middle")
+    .text(memfunc.xLabel);
+
+    vis.append("text")
+    .attr("class", "label")
+    .attr("transform", "rotate(-90)")
+    .attr("x", padding-(h/2))
+    .attr("y", 0)
+    .style("text-anchor", "middle")
+    .text(memfunc.yLabel);
+
+    /////
 
     var curve = vis.selectAll("path.curve")
     .data(getCurve);
@@ -733,14 +782,48 @@ function bezier(memfunc, id){
     stroke(-i);
     return d.length > 1 ? stroke(i) : "red";
   }
+
+  // Update the fields when they are edited
+  $('.mem-fn').keyup(function(){
+    if(selected_node.membership_functions.length > 0){
+      var memFunc = selected_node.membership_functions[current_function];
+      var id = $(this).attr('id').replace("Field", "");
+
+      if(typeof memFunc[id] === "number"){
+        console.log("This is numeric");
+        memFunc[id] = Number($(this).val());
+      }else{
+        console.log("This is not numeric");
+        memFunc[id] = $(this).val();
+      }
+      // memFunc.title = $('#titleField').val();
+      // memFunc.xLabel = $('#xAxisField').val();
+      // memFunc.yLabel = $('#yAxisField').val();
+      // memFunc.xMin = $('#xMinField').val();
+      // memFunc.xMax = $('#xMaxField').val();
+      // memFunc.yMin = $('#yMinField').val();
+      // memFunc.yMax = $('#yMaxField').val();
+      //d3.select("#vis").selectAll("svg").remove();
+      //bezier(memFunc, "myCurve");
+      update();
+    }
+  });
 }
 
 
 
 $('#submitter').click(
   function(){
-    alert(JSON.stringify({nodes: nodes, links: links}));
-    $.post( "test.php", {nodes: nodes, links: links} );
+    //alert(JSON.stringify({nodes: nodes, links: links}));
+    console.log({nodes: nodes, links: links});
+    //$.post( "/", JSON.stringify({nodes: nodes, links: links}), function(data){ alert(data); } );
+    $.ajax({
+      type: "POST",
+      contentType: "application/json",
+      url: '/',
+      data: JSON.stringify({nodes: nodes, links: links})  ,
+      dataType: "json"
+    });
   }
 );
 
