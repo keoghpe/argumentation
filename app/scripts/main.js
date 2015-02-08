@@ -16,87 +16,104 @@ var points = [];
 //  - reflexive edges are indicated on the node (as a bold black circle).
 //  - links are always source < target; edge directions are set by 'left' and 'right'.
 var nodes = [
-  {
-    id: 0,
-    reflexive: false,
-    membership_functions: [{
-      title: "Something else",
-      points: [{x: 1, y: 25}, {x: 0, y: 0}, {x: 10, y: 0}, {x: 20, y: 25}, {x: 22, y: 12}],
-      xLabel: "X Label",
-      yLabel: "Y Label",
-      xMin: 0,
-      xMax: 50,
-      yMin: 0,
-      yMax: 50,
-    },
-    {
-      title: "Something 1",
-      points: [{x: 10, y: 140}, {x: 30, y: 0}, {x: 140, y: 0}, {x: 200, y: 150}, {x: 125, y: 125}],
-      xLabel: "X Label",
-      yLabel: "Y Label",
-      xMin: 0,
-      xMax: 250,
-      yMin: 0,
-      yMax: 300,
-    }
-    ]
-  },
-  {
-    id: 1,
-    reflexive: true,
-    membership_functions: [{
-      title: "Something 2",
-      points: [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
-      xLabel: "X Label",
-      yLabel: "Y Label",
-      xMin: 0,
-      xMax: 250,
-      yMin: 0,
-      yMax: 300,
-    },
-    {
-      title: "Something 3",
-      points: [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
-      xLabel: "X Label",
-      yLabel: "Y Label",
-      xMin: 0,
-      xMax: 250,
-      yMin: 0,
-      yMax: 300,
-    }
-    ]
-  },
-  {
-    id: 2,
-    reflexive: false,
-    membership_functions: [{
-      title: "Something 4",
-      points: [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
-      xLabel: "X Label",
-      yLabel: "Y Label",
-      xMin: 0,
-      xMax: 250,
-      yMin: 0,
-      yMax: 300,
-    },
-    {
-      title: "Something 5",
-      points: [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
-      xLabel: "X Label",
-      yLabel: "Y Label",
-      xMin: 0,
-      xMax: 250,
-      yMin: 0,
-      yMax: 300,
-    }
-    ]
-  }
+  // {
+  //   id: 0,
+  //   reflexive: false,
+  //   membership_functions: [{
+  //     title: "Something else",
+  //     points: [{x: 1, y: 25}, {x: 0, y: 0}, {x: 10, y: 0}, {x: 20, y: 25}, {x: 22, y: 12}],
+  //     xLabel: "X Label",
+  //     yLabel: "Y Label",
+  //     xMin: 0,
+  //     xMax: 50,
+  //     yMin: 0,
+  //     yMax: 50,
+  //   },
+  //   {
+  //     title: "Something 1",
+  //     points: [{x: 10, y: 140}, {x: 30, y: 0}, {x: 140, y: 0}, {x: 200, y: 150}, {x: 125, y: 125}],
+  //     xLabel: "X Label",
+  //     yLabel: "Y Label",
+  //     xMin: 0,
+  //     xMax: 250,
+  //     yMin: 0,
+  //     yMax: 300,
+  //   }
+  //   ]
+  // },
+  // {
+  //   id: 1,
+  //   reflexive: false,
+  //   membership_functions: [{
+  //     title: "Something 2",
+  //     points: [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
+  //     xLabel: "X Label",
+  //     yLabel: "Y Label",
+  //     xMin: 0,
+  //     xMax: 250,
+  //     yMin: 0,
+  //     yMax: 300,
+  //   },
+  //   {
+  //     title: "Something 3",
+  //     points: [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
+  //     xLabel: "X Label",
+  //     yLabel: "Y Label",
+  //     xMin: 0,
+  //     xMax: 250,
+  //     yMin: 0,
+  //     yMax: 300,
+  //   }
+  //   ]
+  // },
+  // {
+  //   id: 2,
+  //   reflexive: false,
+  //   membership_functions: [{
+  //     title: "Something 4",
+  //     points: [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
+  //     xLabel: "X Label",
+  //     yLabel: "Y Label",
+  //     xMin: 0,
+  //     xMax: 250,
+  //     yMin: 0,
+  //     yMax: 300,
+  //   },
+  //   {
+  //     title: "Something 5",
+  //     points: [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
+  //     xLabel: "X Label",
+  //     yLabel: "Y Label",
+  //     xMin: 0,
+  //     xMax: 250,
+  //     yMin: 0,
+  //     yMax: 300,
+  //   }
+  //   ]
+  // }
 ],
-  lastNodeId = 2,
+  lastNodeId = -1,//2,
   links = [
-    {source: nodes[0], target: nodes[1], left: false, right: true },
-    {source: nodes[1], target: nodes[2], left: false, right: true }
+    // {source: nodes[0], target: nodes[1], left: false, right: true },
+    // {source: nodes[1], target: nodes[2], left: false, right: true }
 ];
+
+// Retrieve the object from storage
+var retrievedObject = localStorage.getItem('lastSessionData');
+if(retrievedObject !== null) {
+  var lastData = JSON.parse(retrievedObject);
+
+  nodes = lastData.nodes;
+  links = lastData.links;
+
+  for(var i = 0; i < links.length; i++){
+    links[i].source = nodes[links[i].source.id];
+    links[i].target = nodes[links[i].target.id]
+  }
+
+  lastNodeId = Number(lastData.last);
+  //localStorage.setItem('lastSessionData', JSON.stringify({nodes: nodes, links: links, last: last_node_id}));
+}
 
 // init D3 force layout
 var force = d3.layout.force()
@@ -854,4 +871,10 @@ $('#creator').click(
     // bezier(selected_node.membership_functions[selected_node.membership_functions.length - 1],id);
     current_function = selected_node.membership_functions.length -1;
     drawCurves();
+});
+
+// Save the session every 3 seconds
+$("#save").click(function(){
+  alert("Session saved!");
+  localStorage.setItem('lastSessionData', JSON.stringify({nodes: nodes, links: links, last: lastNodeId}));
 });
