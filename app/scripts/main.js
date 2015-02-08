@@ -878,3 +878,21 @@ $("#save").click(function(){
   alert("Session saved!");
   localStorage.setItem('lastSessionData', JSON.stringify({nodes: nodes, links: links, last: lastNodeId}));
 });
+
+$("#deleter").click(function(){
+  var nodeIndex = nodes.indexOf(selected_node);
+
+
+  // Go through the links and delete relevant links
+  for(var i = 0; i < links.length; i++){
+    var link = links[i];
+
+    if(link.source === selected_node || link.target === selected_node){
+      links.splice(i, 1);
+      i--;
+    }
+  }
+
+  nodes.splice(nodeIndex, 1);
+  restart();
+});
