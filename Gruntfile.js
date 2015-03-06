@@ -140,8 +140,8 @@ module.exports = function (grunt) {
       proxies: [
         {
           context: '/',
-          host: '127.0.0.1',
-          port: 5000
+          host: 'sandbox.dev',
+          port: 8080
         }
       ]
     },

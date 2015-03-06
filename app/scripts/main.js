@@ -2,8 +2,10 @@
 
 // set up SVG for D3
 var width  = 480,
-height = 500,
-colors = d3.scale.category10();
+    height = 500,
+    colors = d3.scale.category10();
+
+var RESULTS = {};
 
 var svg = d3.select('#graph')
 .append('svg')
@@ -122,7 +124,7 @@ var force = d3.layout.force()
 .size([width, height])
 .linkDistance(150)
 .charge(-500)
-.on('tick', tick)
+.on('tick', tick);
 
 // define arrow markers for graph links
 svg.append('svg:defs').append('svg:marker')
@@ -195,7 +197,19 @@ function tick() {
 
 // update graph (called when needed)
 function restart() {
+
+    // force = d3.layout.force()
+    // .nodes(nodes)
+    // .links(links)
+    // .size([width, height])
+    // .linkDistance(150)
+    // .charge(-500)
+    // .on('tick', tick);
     // path (link) group
+
+    force.nodes(nodes);
+    force.links(links);
+
     path = path.data(links);
 
     // update existing links
@@ -831,15 +845,13 @@ function bezier(memfunc, id){
 
 $('#submitter').click(
   function(){
-    //alert(JSON.stringify({nodes: nodes, links: links}));
-    console.log({nodes: nodes, links: links});
-    //$.post( "/", JSON.stringify({nodes: nodes, links: links}), function(data){ alert(data); } );
     $.ajax({
       type: "POST",
       contentType: "application/json",
-      url: '/',
+      url: '/thesis/',
       data: JSON.stringify({nodes: nodes, links: links})  ,
-      dataType: "json"
+      dataType: "json",
+      success: parseReturnedData
     });
   }
 );
@@ -875,8 +887,38 @@ $('#creator').click(
 
 // Save the session every 3 seconds
 $("#save").click(function(){
-  alert("Session saved!");
+
+  //alert("Session saved!");
   localStorage.setItem('lastSessionData', JSON.stringify({nodes: nodes, links: links, last: lastNodeId}));
+  var name = $("#save-name").val();
+
+  if(name !== undefined && name !== ''){
+    $.ajax({
+      type: "POST",
+      contentType: "application/json",
+      url: '/thesis/knowledgebases/' + name,
+      data: JSON.stringify({nodes: nodes, links: links, last: lastNodeId}),
+      dataType: "json",
+      success: function(){
+        console.log("Saved");
+        $('#saveModal').modal('toggle');
+      }
+    });
+  } else {
+    alert("Didn't save");
+    $('#saveModal').modal('toggle');
+  }
+
+});
+
+$("#new").click(function(){
+  localStorage.clear();
+
+  nodes = [];
+  lastNodeId = -1;
+  links = [];
+
+  restart();
 });
 
 $("#deleter").click(function(){
@@ -896,3 +938,111 @@ $("#deleter").click(function(){
   nodes.splice(nodeIndex, 1);
   restart();
 });
+
+$('#load-kb').click(function(){
+  var container = $("#knowledgebase-options");
+  container.empty();
+
+  $.getJSON("/thesis/knowledgebases/", function(data){
+
+    var template = '<div class="radio"><label><input type="radio" name="optionsRadios" id="%NAME%" value="%NAME%">%NAME%</label></div>';
+
+    data.forEach(function(kb){
+
+      kb = kb.substring(0, kb.length - 5);
+
+      var myString = template.replace(/%NAME%/g, kb);
+      container.append(myString);
+    });
+  });
+});
+
+$('#get-kb').click(function(){
+
+  var name = $("input:checked").val();
+
+  if(name !== undefined){
+
+    $.getJSON("/thesis/knowledgebases/" + name, function(data){
+
+      //var lastData = JSON.parse(retrievedObject);
+
+      nodes = data.nodes;
+      links = data.links;
+
+      for(var i = 0; i < links.length; i++){
+        links[i].source = nodes[links[i].source.id];
+        links[i].target = nodes[links[i].target.id]
+      }
+
+      lastNodeId = Number(data.last);
+
+      localStorage.setItem('lastSessionData', JSON.stringify({nodes: nodes, links: links, last: lastNodeId}));
+
+      $('#myModal').modal('toggle');
+
+      restart();
+    });
+
+  } else {
+    $('#myModal').modal('toggle');
+  }
+
+  // var container = $("#knowledgebase-options");
+  // container.empty();
+
+  // $.getJSON("/thesis/knowledgebases/", function(data){
+  //
+  //   data.forEach(function(kb, i){
+  //
+  //     var start = '<div class="radio"><label><input type="radio" name="optionsRadios" id="optionsRadios666" value="option666">',
+  //         end = '</label></div>';
+  //
+  //     start = start.replace(/666/g, i);
+  //     container.append(start + kb + end);
+  //   });
+  // });
+});
+
+$('#load-ds').click(function(){
+  var container = $("#dataset-options");
+  container.empty();
+
+  $.getJSON("/thesis/datasets/", function(data){
+
+    data.forEach(function(ds, i){
+
+      var start = '<div class="radio"><label><input type="radio" name="optionsRadios" id="optionsRadios666" value="option666">',
+          end = '</label></div>';
+
+      start = start.replace(/666/g, i);
+      container.append(start + ds + end);
+    });
+  });
+});
+
+function parseReturnedData(data){
+  for (var prop in data) {
+    RESULTS[prop] = JSON.parse(data[prop]);
+  }
+
+  var results = $('#results');
+  results.empty();
+  results.append('<h1>Results</h1>');
+  var heading = '<div id="%NAME%" class="row"><h2>%NAME%</h2></div>';
+  var content = '<div id="%RESULT%" class="col-xs-2"><p>%RESULT%<button type="button" class="btn btn-info submitRes" id="%ID%">Run</button></p></div>';
+
+  for (var prop in data) {
+    results.append(heading.replace(/%NAME%/g, prop));
+
+
+    if(!Array.isArray(RESULTS[prop][0])){
+      $('#' + prop).append(content.replace(/%RESULT%/g, RESULTS[prop].toString()));
+    } else {
+      for(var i =0; i < RESULTS[prop].length; i++){
+        $('#' + prop).append(content.replace(/%RESULT%/g, RESULTS[prop][i].toString()).replace(/%ID%/g, prop + "-" + i));
+      }
+    }
+
+  }
+}
