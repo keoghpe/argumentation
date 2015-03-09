@@ -339,6 +339,12 @@ function restart() {
         .attr('class', 'id')
         .text(function(d) { return d.id; });
 
+        g.append('svg:text')
+        .attr('x', 0)
+        .attr('y', 25)
+        .attr('class', 'id')
+        .text(function(d) { return d.name; });
+
         // remove old nodes
         circle.exit().remove();
 
@@ -364,13 +370,39 @@ function restart() {
         }
 
         // insert new node at point
-        var point = d3.mouse(this),
-        node = {id: ++lastNodeId, reflexive: false, membership_functions: []};
-        node.x = point[0];
-        node.y = point[1];
-        nodes.push(node);
+        var point = d3.mouse(this);
+        var node_name = prompt("Please enter a name for the node.");
 
-        restart();
+        if(node_name){
+          var node = {id: ++lastNodeId, reflexive: false, membership_functions: [], name: node_name};
+
+          node.x = point[0];
+          node.y = point[1];
+          nodes.push(node);
+          node.membership_functions.push({
+            isOutputFunction: true,
+            title: "Output Function",
+            xLabel: "Degree of Truth",
+            yLabel: "Y Label",
+            xMin: 0,
+            xMax: 1,
+            yMin: 0,
+            yMax: 100,
+            points: [{x: 0, y: 0}, {x: .25, y: 25}, {x: .5, y: 50}, {x: .75, y: 75}, {x: 1, y: 100}]
+          },{
+            isOutputFunction: false,
+            title: "Title",
+            xLabel: "X Label",
+            yLabel: "Degree of Truth",
+            xMin: 0,
+            xMax: 100,
+            yMin: 0,
+            yMax: 1,
+            points: [{x: 0, y: 0}, {x: 25, y: .25}, {x: 50, y: .5}, {x: 75, y: .75}, {x: 100, y: 1}]
+          });
+
+          restart();
+        }
     }
 
     function mousemove() {
@@ -866,9 +898,10 @@ $('#creator').click(
     }
 
     selected_node.membership_functions.push({
+      isOutputFunction: false,
       title: "Title",
       xLabel: "X Label",
-      yLabel: "Y Label",
+      yLabel: "Degree of Truth",
       xMin: 0,
       xMax: 100,
       yMin: 0,
