@@ -380,17 +380,6 @@ function restart() {
           node.y = point[1];
           nodes.push(node);
           node.membership_functions.push({
-            isOutputFunction: true,
-            title: "Output Function",
-            xLabel: "Degree of Truth",
-            yLabel: "Y Label",
-            xMin: 0,
-            xMax: 1,
-            yMin: 0,
-            yMax: 100,
-            points: [{x: 0, y: 0}, {x: .25, y: 25}, {x: .5, y: 50}, {x: .75, y: 75}, {x: 1, y: 100}]
-          },{
-            isOutputFunction: false,
             title: "Title",
             xLabel: "X Label",
             yLabel: "Degree of Truth",
@@ -400,6 +389,17 @@ function restart() {
             yMax: 1,
             points: [{x: 0, y: 0}, {x: 25, y: .25}, {x: 50, y: .5}, {x: 75, y: .75}, {x: 100, y: 1}]
           });
+
+          node.membership_functions["output function"] = {
+            title: "Output Function",
+            xLabel: "Degree of Truth",
+            yLabel: "Y Label",
+            xMin: 0,
+            xMax: 1,
+            yMin: 0,
+            yMax: 100,
+            points: [{x: 0, y: 0}, {x: .25, y: 25}, {x: .5, y: 50}, {x: .75, y: 75}, {x: 1, y: 100}]
+          };
 
           restart();
         }
@@ -510,13 +510,18 @@ function restart() {
     }
 
     function drawCurves(){
+
       fillForm();
+
       var ul = d3.select("#mf-list");
+
       ul.selectAll("li").remove();
       d3.select("#vis").selectAll("svg").remove();
+
       selected_node.membership_functions.forEach(function(points, i){
         // add a button with the number for each mf
         //<button class="btn btn-default">Button</button>
+
         var li = ul.append("li")
         .append("button")
         .attr("class", "btn btn-default")
@@ -530,6 +535,7 @@ function restart() {
           //var id = "curve" + i;
 
           var id = "myCurve";
+
           d3.select("#vis")
           .append("div")
           .attr("id", id);
@@ -541,6 +547,36 @@ function restart() {
           current_function = $(this).text() - 1;
           drawCurves();
         });
+      });
+
+      var i = "output function",
+          points = selected_node.membership_functions[i];
+
+      var li = ul.append("li")
+      .append("button")
+      .attr("class", "btn btn-default")
+      .attr("id", "outputfunc")
+      .text(i);
+
+      //The mf is the selected one
+      if(i === current_function){
+        // Draw the function
+
+        li.attr("class", "btn btn-success");
+        //var id = "curve" + i;
+
+        var id = "myCurve";
+
+        d3.select("#vis")
+        .append("div")
+        .attr("id", id);
+
+        bezier(selected_node.membership_functions[i], id);
+      }
+
+      $('#outputfunc').click(function(){
+        current_function = $(this).text();
+        drawCurves();
       });
     }
 
@@ -898,7 +934,6 @@ $('#creator').click(
     }
 
     selected_node.membership_functions.push({
-      isOutputFunction: false,
       title: "Title",
       xLabel: "X Label",
       yLabel: "Degree of Truth",
@@ -1043,15 +1078,114 @@ $('#load-ds').click(function(){
 
   $.getJSON("/thesis/datasets/", function(data){
 
-    data.forEach(function(ds, i){
+    var template = '<div class="radio"><label><input type="radio" name="optionsRadios" id="%NAME%" value="%NAME%">%NAME%</label></div>';
 
-      var start = '<div class="radio"><label><input type="radio" name="optionsRadios" id="optionsRadios666" value="option666">',
-          end = '</label></div>';
+    data.forEach(function(ds){
 
-      start = start.replace(/666/g, i);
-      container.append(start + ds + end);
+      ds = ds.substring(0, ds.length - 4);
+
+      var myString = template.replace(/%NAME%/g, ds);
+      container.append(myString);
     });
   });
+});
+
+$('#get-ds').click(function(){
+  var name = $("input:checked").val();
+
+  if(name !== undefined){
+
+    d3.csv("/thesis/data_sets/" + name + '.csv', function(data){
+
+
+      var columns = [];
+
+      for(var prop in data[0]){
+        columns.push(prop);
+      }
+
+      d3.select("#dataset table").remove();
+
+      var table = d3.select("#dataset").append("table").attr("class", "table"),
+        thead = table.append("thead"),
+        tbody = table.append("tbody");
+
+        thead.append("tr")
+        .selectAll("th")
+        .data(columns)
+        .enter()
+        .append("th")
+            .text(function(column) { return column; });
+
+        // create a row for each object in the data
+        var rows = tbody.selectAll("tr")
+            .data(data)
+            .enter()
+            .append("tr")
+            .attr("id", function(d,i){
+              return "dataset-row-" + i;
+            });
+
+
+        // create a cell in each row for each column
+         var cells = rows.selectAll("td")
+             .data(function(row) {
+                 return columns.map(function(column) {
+                     return {column: column, value: row[column]};
+                 });
+             })
+             .enter()
+             .append("td")
+                 .text(function(d) { return d.value; });
+
+          rows.append("td")
+            .append("button")
+            .text("submit")
+            .attr("class","submit-row btn btn-primary");
+
+
+
+            // submit the
+            $('.submit-row').click(function(){
+
+
+
+
+
+
+              var id = $(this).parent().parent().attr('id');
+              console.log(data[id.replace("dataset-row-", "")]);
+
+
+              console.log(
+                JSON.stringify({
+                  nodes: nodes,
+                  links: links,
+                  data: data[id.replace("dataset-row-", "")]
+                })
+              );
+
+
+              //
+              // $.ajax({
+              //   type: "POST",
+              //   contentType: "application/json",
+              //   url: '/thesis/',
+              //   data: JSON.stringify({nodes: nodes, links: links}),
+              //   dataType: "json",
+              //   success: parseReturnedData
+              // });
+
+
+            });
+
+
+      $('#mySecondModal').modal('toggle');
+    });
+
+  } else {
+    $('#mySecondModal').modal('toggle');
+  }
 });
 
 function parseReturnedData(data){
@@ -1076,6 +1210,5 @@ function parseReturnedData(data){
         $('#' + prop).append(content.replace(/%RESULT%/g, RESULTS[prop][i].toString()).replace(/%ID%/g, prop + "-" + i));
       }
     }
-
   }
 }
