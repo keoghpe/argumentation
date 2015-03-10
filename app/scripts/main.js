@@ -390,7 +390,18 @@ function restart() {
             points: [{x: 0, y: 0}, {x: 25, y: .25}, {x: 50, y: .5}, {x: 75, y: .75}, {x: 100, y: 1}]
           });
 
-          node.membership_functions["output function"] = {
+          // node.membership_functions["output function"] = {
+          //   title: "Output Function",
+          //   xLabel: "Degree of Truth",
+          //   yLabel: "Y Label",
+          //   xMin: 0,
+          //   xMax: 1,
+          //   yMin: 0,
+          //   yMax: 100,
+          //   points: [{x: 0, y: 0}, {x: .25, y: 25}, {x: .5, y: 50}, {x: .75, y: 75}, {x: 1, y: 100}]
+          // };
+
+          node.output_function = {
             title: "Output Function",
             xLabel: "Degree of Truth",
             yLabel: "Y Label",
@@ -549,14 +560,14 @@ function restart() {
         });
       });
 
-      var i = "output function",
-          points = selected_node.membership_functions[i];
+      var i = "Output Function",
+          points = selected_node.output_function;
 
       var li = ul.append("li")
       .append("button")
       .attr("class", "btn btn-default")
       .attr("id", "outputfunc")
-      .text(i);
+      .text("Output Function");
 
       //The mf is the selected one
       if(i === current_function){
@@ -571,7 +582,7 @@ function restart() {
         .append("div")
         .attr("id", id);
 
-        bezier(selected_node.membership_functions[i], id);
+        bezier(selected_node.output_function, id);
       }
 
       $('#outputfunc').click(function(){
@@ -580,9 +591,22 @@ function restart() {
       });
     }
 
+
+
+
+
+
+
     function fillForm(){
       if(selected_node.membership_functions.length > 0){
-        var memFunc = selected_node.membership_functions[current_function];
+
+        var memFunc;
+
+        if(current_function === "Output Function"){
+          memFunc = selected_node.output_function;
+        } else {
+          memFunc = selected_node.membership_functions[current_function];
+        }
         $('#titleField').val(memFunc.title);
         $('#xAxisField').val(memFunc.xLabel);
         $('#yAxisField').val(memFunc.yLabel);
@@ -885,7 +909,15 @@ function bezier(memfunc, id){
   // Update the fields when they are edited
   $('.mem-fn').keyup(function(){
     if(selected_node.membership_functions.length > 0){
-      var memFunc = selected_node.membership_functions[current_function];
+      var memFunc;
+
+      if(current_function === "Output Function"){
+        memFunc = selected_node.output_function;
+      } else {
+        memFunc = selected_node.membership_functions[current_function];
+      }
+
+
       var id = $(this).attr('id').replace("Field", "");
 
       if(typeof memFunc[id] === "number"){
