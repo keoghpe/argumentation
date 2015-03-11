@@ -1221,27 +1221,46 @@ $('#get-ds').click(function(){
 });
 
 function parseReturnedData(data){
+
+  RESULTS = {};
+
   for (var prop in data) {
     //RESULTS[prop] = JSON.parse(data[prop]);
     RESULTS[prop] = data[prop];
   }
 
-  var results = $('#results');
+  $('#resultsModal').modal('toggle');
+  var results = $('#results-body');
   results.empty();
-  results.append('<h1>Results</h1>');
-  var heading = '<div id="%NAME%" class="row"><h2>%NAME%</h2></div>';
-  //var content = '<div id="%RESULT%" class="col-xs-2"><p>%RESULT%<button type="button" class="btn btn-info submitRes" id="%ID%">Run</button></p></div>';
 
-  for (var prop in data) {
-    results.append(heading.replace(/%NAME%/g, prop));
+  if(jQuery.isEmptyObject(RESULTS)){
+    results.append("<p>There are no results associated with this dataset/knowledgebase.</p>");
+  } else {
+
+    var heading = '<div id="%NAME%" class="row"><h4>%NAME%</h4></div>';
+    var content = '<div id="%RESULT%"><p>%RESULT%</p></div>';
+
+    for (var prop in data) {
+      results.append(heading.replace(/%NAME%/g, prop));
 
 
-    if(!Array.isArray(RESULTS[prop][0])){
-      $('#' + prop).append(content.replace(/%RESULT%/g, RESULTS[prop].toString()));
-    } else {
-      for(var i =0; i < RESULTS[prop].length; i++){
-        $('#' + prop).append(content.replace(/%RESULT%/g, RESULTS[prop][i].toString()).replace(/%ID%/g, prop + "-" + i));
+      if(!Array.isArray(RESULTS[prop])){
+
+        var resultsString = "[" + RESULTS[prop].arguments.toString() + "]";
+        resultsString     += "\n Result: " + RESULTS[prop].result;
+
+        $('#' + prop).append(content.replace(/%RESULT%/g, resultsString));
+      } else {
+
+        for(var i =0; i < RESULTS[prop].length; i++){
+
+          var resultsString = "[" + RESULTS[prop][i].arguments.toString() + "]";
+          resultsString     += "\n Result: " + RESULTS[prop][i].result;
+
+          $('#' + prop).append(content.replace(/%RESULT%/g, resultsString).replace(/%ID%/g, prop + "-" + i));
+        }
       }
     }
   }
+
 }
