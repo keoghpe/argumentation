@@ -921,10 +921,10 @@ function bezier(memfunc, id){
       var id = $(this).attr('id').replace("Field", "");
 
       if(typeof memFunc[id] === "number"){
-        console.log("This is numeric");
+        //console.log("This is numeric");
         memFunc[id] = Number($(this).val());
       }else{
-        console.log("This is not numeric");
+        //console.log("This is not numeric");
         memFunc[id] = $(this).val();
       }
       // memFunc.title = $('#titleField').val();
@@ -1000,7 +1000,7 @@ $("#save").click(function(){
       data: JSON.stringify({nodes: nodes, links: links, last: lastNodeId}),
       dataType: "json",
       success: function(){
-        console.log("Saved");
+        //console.log("Saved");
         $('#saveModal').modal('toggle');
       }
     });
@@ -1186,27 +1186,27 @@ $('#get-ds').click(function(){
 
 
               var id = $(this).parent().parent().attr('id');
-              console.log(data[id.replace("dataset-row-", "")]);
+              //console.log(data[id.replace("dataset-row-", "")]);
 
 
-              console.log(
-                JSON.stringify({
-                  nodes: nodes,
-                  links: links,
-                  data: data[id.replace("dataset-row-", "")]
-                })
-              );
+              // console.log(
+              //   JSON.stringify({
+              //     nodes: nodes,
+              //     links: links,
+              //     data: data[id.replace("dataset-row-", "")]
+              //   })
+              // );
 
 
               //
-              // $.ajax({
-              //   type: "POST",
-              //   contentType: "application/json",
-              //   url: '/thesis/',
-              //   data: JSON.stringify({nodes: nodes, links: links}),
-              //   dataType: "json",
-              //   success: parseReturnedData
-              // });
+              $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: '/thesis/',
+                data: JSON.stringify({nodes: nodes, links: links, data: data[id.replace("dataset-row-", "")]}),
+                dataType: "json",
+                success: parseReturnedData
+              });
 
 
             });
@@ -1222,14 +1222,15 @@ $('#get-ds').click(function(){
 
 function parseReturnedData(data){
   for (var prop in data) {
-    RESULTS[prop] = JSON.parse(data[prop]);
+    //RESULTS[prop] = JSON.parse(data[prop]);
+    RESULTS[prop] = data[prop];
   }
 
   var results = $('#results');
   results.empty();
   results.append('<h1>Results</h1>');
   var heading = '<div id="%NAME%" class="row"><h2>%NAME%</h2></div>';
-  var content = '<div id="%RESULT%" class="col-xs-2"><p>%RESULT%<button type="button" class="btn btn-info submitRes" id="%ID%">Run</button></p></div>';
+  //var content = '<div id="%RESULT%" class="col-xs-2"><p>%RESULT%<button type="button" class="btn btn-info submitRes" id="%ID%">Run</button></p></div>';
 
   for (var prop in data) {
     results.append(heading.replace(/%NAME%/g, prop));

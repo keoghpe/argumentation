@@ -84,6 +84,12 @@ module.exports = function (grunt) {
           remote: 'git@github.com:keoghpe/argumentation.git',
           branch: 'gh-pages'
         }
+      },
+      local: {
+        options: {
+          remote: '~/Desktop/sandbox',
+          branch: 'build'
+        }
       }
     },
 
