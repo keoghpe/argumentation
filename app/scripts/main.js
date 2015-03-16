@@ -729,8 +729,13 @@ function bezier(memfunc, id){
     .range([memfunc.yMin, memfunc.yMax]);
 
 
-    d.x = Math.min(memfunc.xMax, Math.max(memfunc.xMin, this.__origin__[0] += xReverseScale(d3.event.dx)));
-    d.y = Math.min(memfunc.yMax, Math.max(memfunc.yMin, this.__origin__[1] -= yReverseScale(d3.event.dy)));
+    var dxScaled = xReverseScale(d3.event.dx) - memfunc.xMin;
+    var dyScaled = yReverseScale(d3.event.dy) - memfunc.yMin;
+
+    console.log("DY is " + dyScaled);
+
+    d.x = Math.min(memfunc.xMax, Math.max(memfunc.xMin, this.__origin__[0] += dxScaled));
+    d.y = Math.min(memfunc.yMax, Math.max(memfunc.yMin, this.__origin__[1] -= dyScaled));
 
     bezier = {};
     update();
