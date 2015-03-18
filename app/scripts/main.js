@@ -7,10 +7,23 @@ var width  = 480,
 
 var RESULTS = {};
 
+var zoom = d3.behavior.zoom()
+    .scaleExtent([.1, 10])
+    .on("zoom", function() {
+      //container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+      container.attr("transform", "scale(" + d3.event.scale + ")");
+      console.log("zoom");
+    });
+
+
 var svg = d3.select('#graph')
 .append('svg')
 .attr('width', width)
-.attr('height', height);
+.attr('height', height)
+.call(zoom);
+
+var container = svg.append("g");
+
 var points = [];
 
 // set up initial nodes and links
@@ -100,6 +113,10 @@ var nodes = [
     // {source: nodes[1], target: nodes[2], left: false, right: true }
 ];
 
+
+var templateCurves = [];
+
+
 // Retrieve the object from storage
 var retrievedObject = localStorage.getItem('lastSessionData');
 if(retrievedObject !== null) {
@@ -107,6 +124,7 @@ if(retrievedObject !== null) {
 
   nodes = lastData.nodes;
   links = lastData.links;
+  templateCurves = lastData.templates;
 
   for(var i = 0; i < links.length; i++){
     links[i].source = nodes[links[i].source.id];
@@ -127,7 +145,7 @@ var force = d3.layout.force()
 .on('tick', tick);
 
 // define arrow markers for graph links
-svg.append('svg:defs').append('svg:marker')
+container.append('svg:defs').append('svg:marker')
 .attr('id', 'end-arrow')
 .attr('viewBox', '0 -5 10 10')
 .attr('refX', 6)
@@ -138,7 +156,7 @@ svg.append('svg:defs').append('svg:marker')
 .attr('d', 'M0,-5L10,0L0,5')
 .attr('fill', '#000');
 
-svg.append('svg:defs').append('svg:marker')
+container.append('svg:defs').append('svg:marker')
 .attr('id', 'start-arrow')
 .attr('viewBox', '0 -5 10 10')
 .attr('refX', 4)
@@ -150,13 +168,13 @@ svg.append('svg:defs').append('svg:marker')
 .attr('fill', '#000');
 
 // line displayed when dragging new nodes
-var drag_line = svg.append('svg:path')
+var drag_line = container.append('svg:path')
 .attr('class', 'link dragline hidden')
 .attr('d', 'M0,0L0,0');
 
 // handles to link and node element groups
-var path = svg.append('svg:g').selectAll('path'),
-circle = svg.append('svg:g').selectAll('g');
+var path = container.append('svg:g').selectAll('path'),
+circle = container.append('svg:g').selectAll('g');
 
 // mouse event vars
 var selected_node = null,
@@ -461,7 +479,7 @@ function restart() {
         // // ctrl
         // if(d3.event.keyCode === 17) {
         //     circle.call(force.drag);
-        //     svg.classed('ctrl', true);
+        //     container.classed('ctrl', true);
         // }
         //
         // if(!selected_node && !selected_link) return;
@@ -516,7 +534,7 @@ function restart() {
         //     circle
         //     .on('mousedown.drag', null)
         //     .on('touchstart.drag', null);
-        //     svg.classed('ctrl', false);
+        //     container.classed('ctrl', false);
         // }
     }
 
@@ -551,6 +569,10 @@ function restart() {
           .append("div")
           .attr("id", id);
 
+
+          $('#save-curve').remove();
+          $('#vis').append('<button class="btn" id="save-curve">Save as template</button>');
+
           bezier(selected_node.membership_functions[i], id);
         }
 
@@ -560,8 +582,8 @@ function restart() {
         });
       });
 
-      var i = "Output Function",
-          points = selected_node.output_function;
+      //var i = "Output Function",
+      var points = selected_node.output_function;
 
       var li = ul.append("li")
       .append("button")
@@ -569,12 +591,15 @@ function restart() {
       .attr("id", "outputfunc")
       .text("Output Function");
 
+      drawTemplateDropdown();
+
       //The mf is the selected one
-      if(i === current_function){
+      if("Output Function" === current_function){
         // Draw the function
 
         li.attr("class", "btn btn-success");
         //var id = "curve" + i;
+
 
         var id = "myCurve";
 
@@ -588,6 +613,17 @@ function restart() {
       $('#outputfunc').click(function(){
         current_function = $(this).text();
         drawCurves();
+      });
+
+      $('#save-curve').click(function(){
+
+        var current = selected_node.membership_functions[current_function] || selected_node.output_function;
+        templateCurves.push(current);
+        templateCurves = $.unique(templateCurves);
+
+        drawTemplateDropdown();
+
+          // and append the title to the list
       });
     }
 
@@ -732,7 +768,6 @@ function bezier(memfunc, id){
     var dxScaled = xReverseScale(d3.event.dx) - memfunc.xMin;
     var dyScaled = yReverseScale(d3.event.dy) - memfunc.yMin;
 
-    console.log("DY is " + dyScaled);
 
     d.x = Math.min(memfunc.xMax, Math.max(memfunc.xMin, this.__origin__[0] += dxScaled));
     d.y = Math.min(memfunc.yMax, Math.max(memfunc.yMin, this.__origin__[1] -= dyScaled));
@@ -990,11 +1025,10 @@ $('#creator').click(
     drawCurves();
 });
 
-// Save the session every 3 seconds
 $("#save").click(function(){
 
   //alert("Session saved!");
-  localStorage.setItem('lastSessionData', JSON.stringify({nodes: nodes, links: links, last: lastNodeId}));
+  localStorage.setItem('lastSessionData', JSON.stringify({nodes: nodes, links: links, last: lastNodeId, templates: templateCurves}));
   var name = $("#save-name").val();
 
   if(name !== undefined && name !== ''){
@@ -1002,7 +1036,7 @@ $("#save").click(function(){
       type: "POST",
       contentType: "application/json",
       url: '/thesis/knowledgebases/' + name,
-      data: JSON.stringify({nodes: nodes, links: links, last: lastNodeId}),
+      data: JSON.stringify({nodes: nodes, links: links, last: lastNodeId, templates: templateCurves}),
       dataType: "json",
       success: function(){
         //console.log("Saved");
@@ -1081,8 +1115,9 @@ $('#get-kb').click(function(){
       }
 
       lastNodeId = Number(data.last);
+      templateCurves = data.templates;
 
-      localStorage.setItem('lastSessionData', JSON.stringify({nodes: nodes, links: links, last: lastNodeId}));
+      localStorage.setItem('lastSessionData', JSON.stringify({nodes: nodes, links: links, last: lastNodeId, templates: templateCurves}));
 
       $('#myModal').modal('toggle');
 
@@ -1225,6 +1260,7 @@ $('#get-ds').click(function(){
   }
 });
 
+
 function parseReturnedData(data){
 
   RESULTS = {};
@@ -1268,4 +1304,27 @@ function parseReturnedData(data){
     }
   }
 
+}
+
+function drawTemplateDropdown(){
+  var tflist = $('#templateFunctionList');
+  tflist.empty();
+  templateCurves.forEach(function(curve){
+
+    tflist.append('<li role="presentation" class="template_function"><a role="menuitem" tabindex="-1" href="#">'+ curve.title +'</a></li>');
+  });
+
+  $('.template_function').click(function(){
+    var $clicked = $(this);
+    var newFunc = $.grep(templateCurves, function(e){ return e.title == $clicked.text(); });
+    console.log(newFunc);
+
+    if("Output Function" === current_function){
+      selected_node.output_function = newFunc[0];
+    }else{
+      selected_node.membership_functions[current_function] = newFunc[0];
+    }
+
+    drawCurves();
+  });
 }
