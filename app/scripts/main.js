@@ -1,8 +1,8 @@
 "use strict"
 
 // set up SVG for D3
-var width  = 480,
-    height = 500,
+var width  = 800,
+    height = 800,
     colors = d3.scale.category10();
 
 var RESULTS = {};
@@ -1176,6 +1176,33 @@ $('#get-ds').click(function(){
         columns.push(prop);
       }
 
+      // dropdown
+
+      var xaxlist = $('#x-axis-list');
+      xaxlist.empty();
+      columns.forEach(function(name){
+
+        xaxlist.append('<li role="presentation" class="xaxlabel"><a role="menuitem" tabindex="-1">'+ name +'</a></li>');
+      });
+      xaxlist.append('<li role="presentation" class="xaxlabel"><a role="menuitem" tabindex="-1">Degree of Truth</a></li>');
+
+      $('.xaxlabel').click(function(){
+
+        var newlabel = $(this).text();
+
+        if("Output Function" === current_function){
+          selected_node.output_function.xLabel = newlabel;
+        }else{
+          selected_node.membership_functions[current_function].xLabel = newlabel;
+        }
+
+        drawCurves();
+      });
+
+      // end dropdown
+
+
+
       d3.select("#dataset table").remove();
 
       var table = d3.select("#dataset").append("table").attr("class", "table"),
@@ -1198,6 +1225,7 @@ $('#get-ds').click(function(){
               return "dataset-row-" + i;
             });
 
+            console.log(data);
 
         // create a cell in each row for each column
          var cells = rows.selectAll("td")
@@ -1287,7 +1315,7 @@ function parseReturnedData(data){
 
       if(!Array.isArray(RESULTS[prop])){
 
-        var resultsString = "[" + RESULTS[prop].arguments.toString() + "]";
+        var resultsString = "[" + getArgName(RESULTS[prop].arguments) + "]";
         resultsString     += "\n Result: " + RESULTS[prop].result;
 
         $('#' + prop).append(content.replace(/%RESULT%/g, resultsString));
@@ -1295,7 +1323,7 @@ function parseReturnedData(data){
 
         for(var i =0; i < RESULTS[prop].length; i++){
 
-          var resultsString = "[" + RESULTS[prop][i].arguments.toString() + "]";
+          var resultsString = "[" + getArgName(RESULTS[prop][i].arguments) + "]";
           resultsString     += "\n Result: " + RESULTS[prop][i].result;
 
           $('#' + prop).append(content.replace(/%RESULT%/g, resultsString).replace(/%ID%/g, prop + "-" + i));
@@ -1311,7 +1339,7 @@ function drawTemplateDropdown(){
   tflist.empty();
   templateCurves.forEach(function(curve){
 
-    tflist.append('<li role="presentation" class="template_function"><a role="menuitem" tabindex="-1" href="#">'+ curve.title +'</a></li>');
+    tflist.append('<li role="presentation" class="template_function"><a role="menuitem" tabindex="-1">'+ curve.title +'</a></li>');
   });
 
   $('.template_function').click(function(){
@@ -1327,4 +1355,25 @@ function drawTemplateDropdown(){
 
     drawCurves();
   });
+}
+
+
+function getArgName(index){
+
+  var result = "";
+
+  console.log(index);
+
+  for(var i = 0; i < index.length; i++){
+    console.log(index[i]);
+    if(index[i] === ""){
+      break;
+    }
+
+    var thing = $.grep(nodes, function(n){ return n.id == index[i]; });
+
+    result += thing[0].name + ", ";
+  }
+
+  return result;
 }

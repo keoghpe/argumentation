@@ -148,28 +148,38 @@
                 </div>
                 <div class="form-group col-xs-3">
                   <label for="exampleInputEmail1">X Axis (Dataset must be loaded)</label>
-                  <input type="text" class="form-control mem-fn" id="xLabelField" placeholder="Enter a Title">
+
+                  <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+                      Dropdown
+                      <span class="caret"></span>
+                    </button>
+                    <ul id="x-axis-list" class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                    </ul>
+                  </div>
                 </div>
                 <div class="form-group col-xs-3">
                   <label for="exampleInputEmail1">Y Axis</label>
                   <input type="text" class="form-control mem-fn" id="yLabelField" placeholder="Enter a Title">
                 </div>
-                <div class="form-group col-xs-3">
-                  <label for="exampleInputEmail1">X Min</label>
-                  <input type="text" class="form-control mem-fn" id="xMinField" placeholder="Enter a Title">
-                </div>
-                <div class="form-group col-xs-3">
-                  <label for="exampleInputEmail1">X Max</label>
-                  <input type="text" class="form-control mem-fn" id="xMaxField" placeholder="Enter a Title">
-                </div>
-                <div class="form-group col-xs-3">
-                  <label for="exampleInputEmail1">Y Min</label>
-                  <input type="text" class="form-control mem-fn" id="yMinField" placeholder="Enter a Title">
-                </div>
-                <div class="form-group col-xs-3">
-                  <label for="exampleInputEmail1">Y Max</label>
-                  <input type="text" class="form-control mem-fn" id="yMaxField" placeholder="Enter a Title">
-                </div>
+                <div class="row">
+                  <div class="form-group col-xs-3">
+                    <label for="exampleInputEmail1">X Min</label>
+                    <input type="text" class="form-control mem-fn" id="xMinField" placeholder="Enter a Title">
+                  </div>
+                  <div class="form-group col-xs-3">
+                    <label for="exampleInputEmail1">X Max</label>
+                    <input type="text" class="form-control mem-fn" id="xMaxField" placeholder="Enter a Title">
+                  </div>
+                  <div class="form-group col-xs-3">
+                    <label for="exampleInputEmail1">Y Min</label>
+                    <input type="text" class="form-control mem-fn" id="yMinField" placeholder="Enter a Title">
+                  </div>
+                  <div class="form-group col-xs-3">
+                    <label for="exampleInputEmail1">Y Max</label>
+                    <input type="text" class="form-control mem-fn" id="yMaxField" placeholder="Enter a Title">
+                  </div>
+                </div>                
               </form>
           </div>
       </div>
