@@ -7,20 +7,20 @@ var width  = 800,
 
 var RESULTS = {};
 
-var zoom = d3.behavior.zoom()
-    .scaleExtent([.1, 10])
-    .on("zoom", function() {
-      //container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-      container.attr("transform", "scale(" + d3.event.scale + ")");
-      console.log("zoom");
-    });
+// var zoom = d3.behavior.zoom()
+//     .scaleExtent([.1, 10])
+//     .on("zoom", function() {
+//       //container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+//       container.attr("transform", "scale(" + d3.event.scale + ")");
+//       console.log("zoom");
+//     });
 
 
 var svg = d3.select('#graph')
 .append('svg')
 .attr('width', width)
-.attr('height', height)
-.call(zoom);
+.attr('height', height);
+//.call(zoom);
 
 var container = svg.append("g");
 
@@ -140,8 +140,8 @@ var force = d3.layout.force()
 .nodes(nodes)
 .links(links)
 .size([width, height])
-.linkDistance(150)
-.charge(-500)
+.linkDistance(200)
+.charge(-200)
 .on('tick', tick);
 
 // define arrow markers for graph links
@@ -1243,40 +1243,39 @@ $('#get-ds').click(function(){
             .text("submit")
             .attr("class","submit-row btn btn-primary");
 
-
-
-            // submit the
             $('.submit-row').click(function(){
 
 
-
-
-
+              $('#extensionSelectModal').modal('toggle');
 
               var id = $(this).parent().parent().attr('id');
-              //console.log(data[id.replace("dataset-row-", "")]);
 
 
-              // console.log(
-              //   JSON.stringify({
-              //     nodes: nodes,
-              //     links: links,
-              //     data: data[id.replace("dataset-row-", "")]
-              //   })
-              // );
+              $('#getSemantics').click(function(){
+                var checkboxes = $('#extensionCheckboxes input:checked');
+                var values = "";
 
+                var first = true;
+                for(var i =0; i < checkboxes.length; i++){
+                  if(!first){
+                    values += ","
+                  } else {
+                    first = false;
+                  }
+                  values += checkboxes[i].value;
+                }
 
-              //
-              $.ajax({
-                type: "POST",
-                contentType: "application/json",
-                url: '/thesis/',
-                data: JSON.stringify({nodes: nodes, links: links, data: data[id.replace("dataset-row-", "")]}),
-                dataType: "json",
-                success: parseReturnedData
+                $.ajax({
+                  type: "POST",
+                  contentType: "application/json",
+                  url: '/thesis/',
+                  data: JSON.stringify({nodes: nodes, links: links, data: data[id.replace("dataset-row-", "")], extensions: values}),
+                  dataType: "json",
+                  success: parseReturnedData
+                });
+
+                $('#extensionSelectModal').modal('toggle');
               });
-
-
             });
 
 
@@ -1291,11 +1290,13 @@ $('#get-ds').click(function(){
 
 function parseReturnedData(data){
 
+
+  console.log(data);
   RESULTS = {};
 
-  for (var prop in data) {
+  for (var prop in data.results) {
     //RESULTS[prop] = JSON.parse(data[prop]);
-    RESULTS[prop] = data[prop];
+    RESULTS[prop] = data.results[prop];
   }
 
   $('#resultsModal').modal('toggle');
@@ -1309,7 +1310,7 @@ function parseReturnedData(data){
     var heading = '<div id="%NAME%" class="row"><h4>%NAME%</h4></div>';
     var content = '<div id="%RESULT%"><p>%RESULT%</p></div>';
 
-    for (var prop in data) {
+    for (var prop in data.results) {
       results.append(heading.replace(/%NAME%/g, prop));
 
 
@@ -1346,11 +1347,12 @@ function drawTemplateDropdown(){
     var $clicked = $(this);
     var newFunc = $.grep(templateCurves, function(e){ return e.title == $clicked.text(); });
     console.log(newFunc);
+    var copiedObject = jQuery.extend({},newFunc[0]);
 
     if("Output Function" === current_function){
-      selected_node.output_function = newFunc[0];
+      selected_node.output_function = copiedObject;
     }else{
-      selected_node.membership_functions[current_function] = newFunc[0];
+      selected_node.membership_functions[current_function] = copiedObject;
     }
 
     drawCurves();
