@@ -30,88 +30,9 @@ var points = [];
 //  - nodes are known by 'id', not by index in array.
 //  - reflexive edges are indicated on the node (as a bold black circle).
 //  - links are always source < target; edge directions are set by 'left' and 'right'.
-var nodes = [
-  // {
-  //   id: 0,
-  //   reflexive: false,
-  //   membership_functions: [{
-  //     title: "Something else",
-  //     points: [{x: 1, y: 25}, {x: 0, y: 0}, {x: 10, y: 0}, {x: 20, y: 25}, {x: 22, y: 12}],
-  //     xLabel: "X Label",
-  //     yLabel: "Y Label",
-  //     xMin: 0,
-  //     xMax: 50,
-  //     yMin: 0,
-  //     yMax: 50,
-  //   },
-  //   {
-  //     title: "Something 1",
-  //     points: [{x: 10, y: 140}, {x: 30, y: 0}, {x: 140, y: 0}, {x: 200, y: 150}, {x: 125, y: 125}],
-  //     xLabel: "X Label",
-  //     yLabel: "Y Label",
-  //     xMin: 0,
-  //     xMax: 250,
-  //     yMin: 0,
-  //     yMax: 300,
-  //   }
-  //   ]
-  // },
-  // {
-  //   id: 1,
-  //   reflexive: false,
-  //   membership_functions: [{
-  //     title: "Something 2",
-  //     points: [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
-  //     xLabel: "X Label",
-  //     yLabel: "Y Label",
-  //     xMin: 0,
-  //     xMax: 250,
-  //     yMin: 0,
-  //     yMax: 300,
-  //   },
-  //   {
-  //     title: "Something 3",
-  //     points: [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
-  //     xLabel: "X Label",
-  //     yLabel: "Y Label",
-  //     xMin: 0,
-  //     xMax: 250,
-  //     yMin: 0,
-  //     yMax: 300,
-  //   }
-  //   ]
-  // },
-  // {
-  //   id: 2,
-  //   reflexive: false,
-  //   membership_functions: [{
-  //     title: "Something 4",
-  //     points: [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
-  //     xLabel: "X Label",
-  //     yLabel: "Y Label",
-  //     xMin: 0,
-  //     xMax: 250,
-  //     yMin: 0,
-  //     yMax: 300,
-  //   },
-  //   {
-  //     title: "Something 5",
-  //     points: [{x: 10, y: 250}, {x: 0, y: 0}, {x: 100, y: 0}, {x: 200, y: 250}, {x: 225, y: 125}],
-  //     xLabel: "X Label",
-  //     yLabel: "Y Label",
-  //     xMin: 0,
-  //     xMax: 250,
-  //     yMin: 0,
-  //     yMax: 300,
-  //   }
-  //   ]
-  // }
-],
-  lastNodeId = -1,//2,
-  links = [
-    // {source: nodes[0], target: nodes[1], left: false, right: true },
-    // {source: nodes[1], target: nodes[2], left: false, right: true }
-];
+var nodes = [],
+  lastNodeId = -1,
+  links = [];
 
 
 var templateCurves = [];
@@ -132,7 +53,6 @@ if(retrievedObject !== null) {
   }
 
   lastNodeId = Number(lastData.last);
-  //localStorage.setItem('lastSessionData', JSON.stringify({nodes: nodes, links: links, last: last_node_id}));
 }
 
 // init D3 force layout
@@ -215,15 +135,6 @@ function tick() {
 
 // update graph (called when needed)
 function restart() {
-
-    // force = d3.layout.force()
-    // .nodes(nodes)
-    // .links(links)
-    // .size([width, height])
-    // .linkDistance(150)
-    // .charge(-500)
-    // .on('tick', tick);
-    // path (link) group
 
     force.nodes(nodes);
     force.links(links);
@@ -407,17 +318,6 @@ function restart() {
             yMax: 1,
             points: [{x: 0, y: 0}, {x: 25, y: .25}, {x: 50, y: .5}, {x: 75, y: .75}, {x: 100, y: 1}]
           });
-
-          // node.membership_functions["output function"] = {
-          //   title: "Output Function",
-          //   xLabel: "Degree of Truth",
-          //   yLabel: "Y Label",
-          //   xMin: 0,
-          //   xMax: 1,
-          //   yMin: 0,
-          //   yMax: 100,
-          //   points: [{x: 0, y: 0}, {x: .25, y: 25}, {x: .5, y: 50}, {x: .75, y: 75}, {x: 1, y: 100}]
-          // };
 
           node.output_function = {
             title: "Output Function",
@@ -623,14 +523,8 @@ function restart() {
 
         drawTemplateDropdown();
 
-          // and append the title to the list
       });
     }
-
-
-
-
-
 
 
     function fillForm(){
@@ -686,14 +580,6 @@ function bezier(memfunc, id){
   .append("g")
   .attr("transform", "translate(" + padding + "," + padding + ")");
 
-  // vis.append("text")
-  // .attr("x", (w / 2))
-  // .attr("y", padding)
-  // .attr("text-anchor", "middle")
-  // .style("font-size", "16px")
-  // .style("text-decoration", "underline")
-  // .text(memfunc.title);
-  //
   var xScale = d3.scale.linear()
                   .domain([memfunc.xMin, memfunc.xMax])
                   .range([0, w - 2*padding]);
@@ -701,37 +587,6 @@ function bezier(memfunc, id){
   var yScale = d3.scale.linear()
                   .domain([memfunc.yMin, memfunc.yMax])
                   .range([h - 2*padding, 0]);
-
-  //
-  // var xAxis = d3.svg.axis();
-  // var yAxis = d3.svg.axis()
-  //             .scale(yScale)
-  //             .orient("left");
-  //
-  // xAxis.scale(xScale);
-  //
-  // vis.append("g")
-  // .attr("class", "axis")
-  // .attr("transform", "translate("+padding+","+ (h - 2 * padding) + ")")
-  // .call(xAxis);
-  //
-  // vis.append("g")
-  // .attr("class", "axis")
-  // .attr("transform", "translate(" + padding + ", 0)")
-  // .call(yAxis);
-  //
-  // vis.append("text")
-  // .attr("x", w/2 - padding )
-  // .attr("y",  h - padding)
-  // .style("text-anchor", "middle")
-  // .text(memfunc.xLabel);
-  //
-  // vis.append("text")
-  // .attr("transform", "rotate(-90)")
-  // .attr("x", padding-(h/2))
-  // .attr("y", 0)
-  // .style("text-anchor", "middle")
-  // .text(memfunc.yLabel);
 
   update();
 
@@ -780,12 +635,6 @@ function bezier(memfunc, id){
     delete this.__origin__;
   }));
 
-  // vis.append("text")
-  // .attr("class", "t")
-  // .attr("x", w / 2)
-  // .attr("y", h)
-  // .attr("text-anchor", "middle");
-
   vis.selectAll("text.controltext")
   .data(function(d) { return points.slice(0, 6); })
   .enter().append("text")
@@ -795,12 +644,6 @@ function bezier(memfunc, id){
   .text(function(d, i) { return "P" + i });
 
   var last = 0;
-  // d3.timer(function(elapsed) {
-  //   // t = (t + (elapsed - last) / 5000) % 1;
-  //   // last = elapsed;
-  //   t = 1;
-  //   update();
-  // });
 
   function update() {
     var interpolation = vis.selectAll("g")
@@ -809,23 +652,6 @@ function bezier(memfunc, id){
     .style("fill", colour)
     .style("stroke", colour);
 
-    // var circle = interpolation.selectAll("circle")
-    // .data(Object);
-    // circle.enter().append("circle")
-    // .attr("r", 4);
-    // circle
-    // .attr("cx", x)
-    // .attr("cy", y);
-
-    // var path = interpolation.selectAll("path")
-    // .data(function(d) { return [d]; });
-    // path.enter().append("path")
-    // .attr("class", "line")
-    // .attr("d", line);
-    // path.attr("d", line);
-
-    //////
-
     xScale = d3.scale.linear()
     .domain([memfunc.xMin, memfunc.xMax])
     .range([0, w - 2*padding]);
@@ -833,14 +659,6 @@ function bezier(memfunc, id){
     yScale = d3.scale.linear()
     .domain([memfunc.yMin, memfunc.yMax])
     .range([h - 2*padding, 0]);
-
-    // xReverseScale = d3.scale.linear()
-    // .domain([0, w - 2*padding])
-    // .range([memfunc.xMin, memfunc.xMax]);
-    //
-    // yReverseScale = d3.scale.linear()
-    // .domain([0, h - 2*padding])
-    // .range([memfunc.yMin, memfunc.yMax]);
 
     var xAxis = d3.svg.axis();
     var yAxis = d3.svg.axis()
@@ -889,8 +707,6 @@ function bezier(memfunc, id){
     .style("text-anchor", "middle")
     .text(memfunc.yLabel);
 
-    /////
-
     var curve = vis.selectAll("path.curve")
     .data(getCurve);
     curve.enter().append("path")
@@ -904,8 +720,6 @@ function bezier(memfunc, id){
     vis.selectAll("text.controltext")
     .attr("x", x)
     .attr("y", y);
-    // vis.selectAll("text.t")
-    // .text("t=" + t.toFixed(2));
   }
 
   function interpolate(d, p) {
@@ -948,6 +762,18 @@ function bezier(memfunc, id){
 
   // Update the fields when they are edited
   $('.mem-fn').keyup(function(){
+
+    //  TO DO: Performance Enhancement
+    //  Only run the code 200ms after an update has been made
+    //  Wrap the following with:
+    //
+    //  if(this.timeoutId)
+    //    window.clearTimeout(this.timeoutId);
+    //  this.timeoutId = window.setTimeout(function (){
+    //   // MY CODE HERE
+    //  },200);
+    //
+
     if(selected_node.membership_functions.length > 0){
       var memFunc;
 
@@ -957,25 +783,15 @@ function bezier(memfunc, id){
         memFunc = selected_node.membership_functions[current_function];
       }
 
-
+      // Remove Field from the ID to get the elements corresponding
+      // attribute in the object
       var id = $(this).attr('id').replace("Field", "");
 
       if(typeof memFunc[id] === "number"){
-        //console.log("This is numeric");
         memFunc[id] = Number($(this).val());
       }else{
-        //console.log("This is not numeric");
         memFunc[id] = $(this).val();
       }
-      // memFunc.title = $('#titleField').val();
-      // memFunc.xLabel = $('#xAxisField').val();
-      // memFunc.yLabel = $('#yAxisField').val();
-      // memFunc.xMin = $('#xMinField').val();
-      // memFunc.xMax = $('#xMaxField').val();
-      // memFunc.yMin = $('#yMinField').val();
-      // memFunc.yMax = $('#yMaxField').val();
-      //d3.select("#vis").selectAll("svg").remove();
-      //bezier(memFunc, "myCurve");
       update();
     }
   });
@@ -1016,11 +832,6 @@ $('#creator').click(
       points: [{x: 0, y: 0}, {x: 25, y: .25}, {x: 50, y: .5}, {x: 75, y: .75}, {x: 100, y: 1}]
     }
     );
-    // var id = "curve" + selected_node.membership_functions.length;
-    // d3.select("#vis")
-    // .append("div")
-    // .attr("id", id);
-    // bezier(selected_node.membership_functions[selected_node.membership_functions.length - 1],id);
     current_function = selected_node.membership_functions.length -1;
     drawCurves();
 });
@@ -1104,8 +915,6 @@ $('#get-kb').click(function(){
 
     $.getJSON("/thesis/knowledgebases/" + name, function(data){
 
-      //var lastData = JSON.parse(retrievedObject);
-
       nodes = data.nodes;
       links = data.links;
 
@@ -1127,21 +936,6 @@ $('#get-kb').click(function(){
   } else {
     $('#myModal').modal('toggle');
   }
-
-  // var container = $("#knowledgebase-options");
-  // container.empty();
-
-  // $.getJSON("/thesis/knowledgebases/", function(data){
-  //
-  //   data.forEach(function(kb, i){
-  //
-  //     var start = '<div class="radio"><label><input type="radio" name="optionsRadios" id="optionsRadios666" value="option666">',
-  //         end = '</label></div>';
-  //
-  //     start = start.replace(/666/g, i);
-  //     container.append(start + kb + end);
-  //   });
-  // });
 });
 
 $('#load-ds').click(function(){
@@ -1169,14 +963,13 @@ $('#get-ds').click(function(){
 
     d3.csv("/thesis/data_sets/" + name + '.csv', function(data){
 
-
       var columns = [];
 
       for(var prop in data[0]){
         columns.push(prop);
       }
 
-      // dropdown
+      // X-Axis Label Dropdown
 
       var xaxlist = $('#x-axis-list');
       xaxlist.empty();
@@ -1214,7 +1007,7 @@ $('#get-ds').click(function(){
         .data(columns)
         .enter()
         .append("th")
-            .text(function(column) { return column; });
+        .text(function(column) { return column; });
 
         // create a row for each object in the data
         var rows = tbody.selectAll("tr")
@@ -1224,8 +1017,6 @@ $('#get-ds').click(function(){
             .attr("id", function(d,i){
               return "dataset-row-" + i;
             });
-
-            console.log(data);
 
         // create a cell in each row for each column
          var cells = rows.selectAll("td")
@@ -1245,37 +1036,12 @@ $('#get-ds').click(function(){
 
             $('.submit-row').click(function(){
 
-
               $('#extensionSelectModal').modal('toggle');
 
-              var id = $(this).parent().parent().attr('id');
+              var id = $(this).parent().parent().attr('id'),
+              the_data = data[id.replace("dataset-row-", "")];
 
-
-              $('#getSemantics').click(function(){
-                var checkboxes = $('#extensionCheckboxes input:checked');
-                var values = "";
-
-                var first = true;
-                for(var i =0; i < checkboxes.length; i++){
-                  if(!first){
-                    values += ","
-                  } else {
-                    first = false;
-                  }
-                  values += checkboxes[i].value;
-                }
-
-                $.ajax({
-                  type: "POST",
-                  contentType: "application/json",
-                  url: '/thesis/',
-                  data: JSON.stringify({nodes: nodes, links: links, data: data[id.replace("dataset-row-", "")], extensions: values}),
-                  dataType: "json",
-                  success: parseReturnedData
-                });
-
-                $('#extensionSelectModal').modal('toggle');
-              });
+              $('#getSemantics').data("data-to-check", the_data);
             });
 
 
@@ -1290,12 +1056,9 @@ $('#get-ds').click(function(){
 
 function parseReturnedData(data){
 
-
-  console.log(data);
   RESULTS = {};
 
   for (var prop in data.results) {
-    //RESULTS[prop] = JSON.parse(data[prop]);
     RESULTS[prop] = data.results[prop];
   }
 
@@ -1316,7 +1079,7 @@ function parseReturnedData(data){
 
       if(!Array.isArray(RESULTS[prop])){
 
-        var resultsString = "[" + getArgName(RESULTS[prop].arguments) + "]";
+        var resultsString = "[" + getArgNames(RESULTS[prop].arguments) + "]";
         resultsString     += "\n Result: " + RESULTS[prop].result;
 
         $('#' + prop).append(content.replace(/%RESULT%/g, resultsString));
@@ -1324,7 +1087,7 @@ function parseReturnedData(data){
 
         for(var i =0; i < RESULTS[prop].length; i++){
 
-          var resultsString = "[" + getArgName(RESULTS[prop][i].arguments) + "]";
+          var resultsString = "[" + getArgNames(RESULTS[prop][i].arguments) + "]";
           resultsString     += "\n Result: " + RESULTS[prop][i].result;
 
           $('#' + prop).append(content.replace(/%RESULT%/g, resultsString).replace(/%ID%/g, prop + "-" + i));
@@ -1332,8 +1095,34 @@ function parseReturnedData(data){
       }
     }
   }
-
 }
+
+$('#getSemantics').click(function(){
+
+  var checkboxes = $('#extensionCheckboxes input:checked');
+  var values = "";
+  var thedata = $(this).data("data-to-check");
+
+  var first = true;
+  for(var i =0; i < checkboxes.length; i++){
+    if(!first){
+      values += ","
+    } else {
+      first = false;
+    }
+    values += checkboxes[i].value;
+  }
+  $('#extensionSelectModal').modal('toggle');
+
+  $.ajax({
+    type: "POST",
+    contentType: "application/json",
+    url: '/thesis/',
+    data: JSON.stringify({nodes: nodes, links: links, data: thedata, extensions: values}),
+    dataType: "json",
+    success: parseReturnedData
+  });
+});
 
 function drawTemplateDropdown(){
   var tflist = $('#templateFunctionList');
@@ -1346,7 +1135,7 @@ function drawTemplateDropdown(){
   $('.template_function').click(function(){
     var $clicked = $(this);
     var newFunc = $.grep(templateCurves, function(e){ return e.title == $clicked.text(); });
-    console.log(newFunc);
+
     var copiedObject = jQuery.extend({},newFunc[0]);
 
     if("Output Function" === current_function){
@@ -1360,22 +1149,27 @@ function drawTemplateDropdown(){
 }
 
 
-function getArgName(index){
+function getArgNames(index){
 
   var result = "";
 
-  console.log(index);
-
   for(var i = 0; i < index.length; i++){
-    console.log(index[i]);
+
     if(index[i] === ""){
       break;
     }
 
-    var thing = $.grep(nodes, function(n){ return n.id == index[i]; });
+    // the the node by index
 
-    result += thing[0].name + ", ";
+    var thing = getNodeByIndex(index[i]);
+
+    result += thing.name + ", ";
   }
 
   return result;
+}
+
+
+function getNodeByIndex(index){
+  return $.grep(nodes, function(n){ return n.id == index; })[0];
 }
